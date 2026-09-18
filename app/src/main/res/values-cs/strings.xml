@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Edoofox</string>
+    <string name="choose_school">Vyberte svou školu</string>
+    <string name="switch_school">Změnit školu</string>
+    <string name="school_instructions">Zadejte subdoménu Edookitu své školy, například zsslovanak. Výběr si na tomto zařízení zapamatujeme.</string>
+    <string name="school_subdomain">Subdoména školy</string>
+    <string name="school_suffix">.edookit.net</string>
+    <string name="use_school">Použít tuto školu</string>
+    <string name="invalid_school">Zadejte pouze subdoménu: 1–63 písmen bez diakritiky, číslic nebo pomlček uvnitř názvu. Bez https:// a .edookit.net.</string>
+    <string name="school_save_error">Školu se nepodařilo uložit. Zkuste to znovu.</string>
+    <string name="refresh">Obnovit</string>
+    <string name="pull_refresh">Tažením obnovíte stránku</string>
+    <string name="release_refresh">Uvolněním obnovíte stránku</string>
+    <string name="gesture_back">Zpět</string>
+    <string name="gesture_forward">Vpřed</string>
+    <string name="more">Další možnosti</string>
+    <string name="home">Úvodní stránka školy</string>
+    <string name="open_browser">Otevřít v prohlížeči</string>
+    <string name="loading">Načítání Edookitu…</string>
+    <string name="error_title">Stránku se nepodařilo načíst</string>
+    <string name="error_message">Zkontrolujte připojení a zkuste to znovu.</string>
+    <string name="error_secure">Zabezpečené připojení se nepodařilo ověřit. Zkuste to prosím později.</string>
+    <string name="error_server">Edookit je dočasně nedostupný. Zkuste to prosím za chvíli.</string>
+    <string name="retry">Zkusit znovu</string>
+    <string name="no_handler">Pro tento odkaz není dostupná žádná aplikace.</string>
+    <string name="unsupported_link">Tento typ odkazu nelze otevřít.</string>
+    <string name="file_picker_unavailable">Výběr souborů není dostupný.</string>
+</resources>

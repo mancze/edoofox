@@ -1,0 +1,4 @@
+<resources>
+    <item name="school_subdomain" type="id" />
+    <item name="cancel_school" type="id" />
+</resources>

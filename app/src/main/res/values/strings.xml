@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Edoofox</string>
+    <string name="choose_school">Choose your school</string>
+    <string name="switch_school">Switch school</string>
+    <string name="school_instructions">Enter your school’s Edookit subdomain, for example zsslovanak. We’ll remember your selection on this device.</string>
+    <string name="school_subdomain">School subdomain</string>
+    <string name="school_suffix">.edookit.net</string>
+    <string name="use_school">Use this school</string>
+    <string name="invalid_school">Enter only the subdomain: 1–63 letters, numbers, or internal hyphens. Do not include https:// or .edookit.net.</string>
+    <string name="school_save_error">Couldn’t save your school. Please try again.</string>
+    <string name="refresh">Refresh</string>
+    <string name="pull_refresh">Pull to refresh</string>
+    <string name="release_refresh">Release to refresh</string>
+    <string name="gesture_back">Back</string>
+    <string name="gesture_forward">Forward</string>
+    <string name="more">More options</string>
+    <string name="home">School homepage</string>
+    <string name="open_browser">Open in browser</string>
+    <string name="loading">Loading Edookit…</string>
+    <string name="error_title">We couldn’t load this page</string>
+    <string name="error_message">Check your connection and try again.</string>
+    <string name="error_secure">The secure connection could not be verified. Please try again later.</string>
+    <string name="error_server">Edookit is temporarily unavailable. Please try again shortly.</string>
+    <string name="retry">Try again</string>
+    <string name="no_handler">No app is available to open this link.</string>
+    <string name="unsupported_link">This type of link cannot be opened.</string>
+    <string name="file_picker_unavailable">No file picker is available.</string>
+</resources>

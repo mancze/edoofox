@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.Edoofox" parent="BaseTheme.Edoofox">
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+    </style>
+</resources>

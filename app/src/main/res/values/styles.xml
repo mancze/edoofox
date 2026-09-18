@@ -1,0 +1,13 @@
+<resources>
+    <color name="purple">#67339C</color>
+    <style name="BaseTheme.Edoofox" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">@color/purple</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowBackground">#FFFFFF</item>
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:navigationBarColor">#67339C</item>
+    </style>
+    <style name="Theme.Edoofox" parent="BaseTheme.Edoofox" />
+</resources>
