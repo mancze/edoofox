@@ -38,6 +38,12 @@ public class SmokeInstrumentation extends Instrumentation {
     @Override public void onStart() {
         Bundle report = new Bundle();
         try {
+            if ("locales".equals(phase)) {
+                LocaleChecks.run(getTargetContext());
+                report.putString("stream", "PASS: Android resource matching for Czech, Slovak, English and unsupported locales; ordered secondary-language preferences; dashboard/cancel translations.\n");
+                finish(Activity.RESULT_OK, report);
+                return;
+            }
             if ("gestures".equals(phase)) {
                 new GestureChecks(this).run();
                 report.putString("stream", "PASS: automatic content header; pinned login, Plus4U and blank pages; login/logout transitions; manual reveal retention; history, two-step refresh, cancelled pulls, nested scrolling and protected widgets.\n");

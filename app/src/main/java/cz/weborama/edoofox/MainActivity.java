@@ -149,7 +149,7 @@ public class MainActivity extends Activity {
         more = iconButton(R.drawable.ic_more, R.string.more);
         more.setOnClickListener(v -> {
             PopupMenu menu = new PopupMenu(this, more);
-            menu.getMenu().add(0, 1, 0, R.string.home);
+            menu.getMenu().add(0, 1, 0, R.string.dashboard);
             menu.getMenu().add(0, 2, 1, R.string.open_browser);
             menu.getMenu().add(0, 3, 2, R.string.switch_school);
             menu.getMenu().add(0, 4, 3, R.string.gesture_back).setEnabled(webView.canGoBack());
@@ -268,7 +268,7 @@ public class MainActivity extends Activity {
         panel.addView(save, new LinearLayout.LayoutParams(-1, -2));
         Button cancel = new Button(this);
         cancel.setId(R.id.cancel_school);
-        cancel.setText(android.R.string.cancel);
+        cancel.setText(R.string.cancel);
         cancel.setOnClickListener(v -> hideSchoolPicker());
         panel.addView(cancel, new LinearLayout.LayoutParams(-1, -2));
         scroll.addView(panel, new android.widget.ScrollView.LayoutParams(-1, -1));
