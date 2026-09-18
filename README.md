@@ -37,7 +37,7 @@ Builds use the pinned Gradle 9.7.1 wrapper (distribution checksum verified) and 
 .\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-The installable development APK is `app/build/outputs/apk/debug/app-debug.apk`. It is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
+Build APKs follow `edoofox-<version>-<build-type>.apk`, for example `edoofox-0.3.5-debug.apk`. The installable development APK is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
 
 The current packaged build is `artifacts/Edoofox-0.3.5-debug.apk`.
 
@@ -49,7 +49,7 @@ file with the keystore path, alias, and passwords, then run:
 .\gradlew.bat :app:assembleRelease
 ```
 
-The signed APK is `app/build/outputs/apk/release/app-release.apk`. Back up the
+The signed APK is `app/build/outputs/apk/release/edoofox-0.3.5-release.apk`. Back up the
 keystore and `keystore.properties` securely; future releases must use the same
 key to update an installed app.
 
@@ -66,7 +66,7 @@ Gesture tests use a separate `.qa` application ID and locally intercepted HTML p
 ```powershell
 .\gradlew.bat -Pqa :app:assembleQa :app:assembleQaAndroidTest
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb -s emulator-5556 install -r app/build/outputs/apk/qa/app-qa.apk
+& $adb -s emulator-5556 install -r app/build/outputs/apk/qa/edoofox-0.3.5-qa.apk
 & $adb -s emulator-5556 install -r app/build/outputs/apk/androidTest/qa/app-qa-androidTest.apk
 & $adb -s emulator-5556 shell am instrument -w -e phase gestures cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
 & $adb -s emulator-5556 shell am instrument -w -e phase locales cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
@@ -80,7 +80,7 @@ Use an isolated emulator, without a real signed-in account. The tests navigate t
 ```powershell
 .\gradlew.bat :app:assembleDebug :app:assembleDebugAndroidTest
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb -s emulator-5556 install -r app/build/outputs/apk/debug/app-debug.apk
+& $adb -s emulator-5556 install -r app/build/outputs/apk/debug/edoofox-0.3.5-debug.apk
 & $adb -s emulator-5556 install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 & $adb -s emulator-5556 shell am instrument -w -e phase schools cz.weborama.edoofox.test/cz.weborama.edoofox.SmokeInstrumentation
 & $adb -s emulator-5556 shell am force-stop cz.weborama.edoofox

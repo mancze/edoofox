@@ -53,4 +53,15 @@ android {
     testBuildType = if (providers.gradleProperty("qa").isPresent) "qa" else "debug"
 }
 
+val artifactVersionName = android.defaultConfig.versionName
+    ?: error("defaultConfig.versionName must be set for APK artifact naming")
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.outputs.forEach { output ->
+            output.outputFileName.set("edoofox-$artifactVersionName-${variant.buildType}.apk")
+        }
+    }
+}
+
 dependencies { testImplementation("junit:junit:4.13.2") }
