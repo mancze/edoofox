@@ -17,6 +17,7 @@ Renamed from Edoofox. The Android application ID remains `cz.weborama.edoofox` s
 - Swipe right within the page to go Back, or left to go Forward. Android's system-edge Back gesture stays unchanged. Back/Forward also appear in the menu.
 - The header hides automatically once the selected school's content has settled, without needing a scroll. Login/Plus4U, school selection, and native error screens keep the header visible. A lightweight foreground-only check recognizes public login markers and authentication routes; this is a presentation heuristic, not proof of authentication. Blank/loading pages remain visible, and site layout changes may require detection updates.
 - Pulling downwards reveals the header; it stays open until scrolling away or navigating. At the top of the page, the first pull reveals a hidden header **without reloading**. Release, then pull again until “Release to refresh” appears to reload. A visible header permits refresh on the first pull. Short/cancelled pulls do nothing.
+- At the top of the document, a floating fox button appears when the header is fully hidden. Tap it to reveal the header without navigating or reloading. It disappears while scrolling, loading, or showing the header. The website's own scroll-to-top control is left unchanged.
 - Horizontal scroll containers and editable fields retain their own gestures. Nested vertical scrolling is respected. Custom gestures are disabled while the keyboard or school chooser is open and during touch exploration (TalkBack); the header remains accessible. Error screens reveal the controls. Loading prevents duplicate pull-refreshes. System status/navigation bars remain visible.
 - Refresh button, **Edookit dashboard / Nástěnka Edookitu**, and open-in-browser menu. The dashboard opens the selected Edookit school root. No external school-homepage item is offered because its address is not known.
 - Page loading indicator and offline/server/certificate error screens with retry.
@@ -37,9 +38,9 @@ Builds use the pinned Gradle 9.7.1 wrapper (distribution checksum verified) and 
 
 The installable development APK is `app/build/outputs/apk/debug/app-debug.apk`. It is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
 
-The current packaged build is `artifacts/Edoofox-0.3.3-debug.apk`.
+The current packaged build is `artifacts/Edoofox-0.3.4-debug.apk`.
 
-The **Project on GitHub / Projekt na GitHubu** menu entry opens the external browser. It temporarily targets `https://github.com/`; replace `PROJECT_URL` in `MainActivity.java` when the repository URL is provided.
+The **About / O aplikaci** menu entry opens a scrollable native dialog with the fox icon, app name, short description, build version, author Michal Novák, and **Project on GitHub / Projekt na GitHubu**. The GitHub button opens the external browser and temporarily targets `https://github.com/`; replace `PROJECT_URL` in `MainActivity.java` when the repository URL is provided. There is no separate GitHub menu item.
 
 ## Translations
 
@@ -56,6 +57,7 @@ $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 & $adb -s emulator-5556 install -r app/build/outputs/apk/androidTest/qa/app-qa-androidTest.apk
 & $adb -s emulator-5556 shell am instrument -w -e phase gestures cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
 & $adb -s emulator-5556 shell am instrument -w -e phase locales cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
+& $adb -s emulator-5556 shell am instrument -w -e phase about cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
 ```
 
 This checks actual touch swipes, history, automatic header hiding, pinned login/Plus4U headers, same-document login/logout transitions, manual reveal retention, two-step refresh, short/cancelled pulls, nested scrolling, horizontal widgets, and text fields. Do not combine `-Pqa` with the normal debug unit-test command.

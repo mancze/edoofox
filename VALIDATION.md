@@ -1,5 +1,15 @@
 # Validation
 
+## Edoofox 0.3.4 — 2026-09-18
+
+- Replaced the direct GitHub menu entry with About / O aplikaci: fox icon, Edoofox, an honest website-wrapper slogan, current build version, author Michal Novák, and the external GitHub link. The URL remains the requested `https://github.com/` placeholder.
+- Added a native floating fox shortcut only while the document is at the top and the header is fully hidden. Tapping reveals the header without navigation or reload. It is absent while the document is scrolled, the header is visible, or loading/setup/login/error UI is active. Website scroll-to-top behavior is not modified.
+- Dedicated API 36 QA tests passed About menu activation, all displayed fields, external GitHub routing, and Close. The initial About test raced the menu-opening animation; it now waits for the dialog to appear before checking content. The About screenshot was visually reviewed.
+- Touch tests passed fox visibility, native tap-to-reveal, no reload, disappearance while scrolling/header-visible, and reappearance on returning to the top, alongside existing gesture regressions. Locale checks passed for all app strings and ordered language preferences. Mascot placement was visually reviewed on a local fixture; actual authenticated website layouts remain unverified.
+- Seven JVM tests passed; lint reported no issues; APK signature verified. No real account data was used or changed.
+- Deliverables: `artifacts/Edoofox-0.3.4-debug.apk` and `artifacts/Edoofox-0.3.4-unsigned.aab`.
+- APK SHA-256: `5da4d58ad4d5669babdb1478103a82f769749a87ca552227ec32e0cfdbaf9bbb`.
+
 ## Edoofox 0.3.3 — 2026-09-18
 
 - Added Project on GitHub / Projekt na GitHubu to the menu. It uses the existing external-browser handler and temporarily points to `https://github.com/`; the repository URL is not yet supplied.
