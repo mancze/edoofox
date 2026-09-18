@@ -40,7 +40,7 @@ public class SmokeInstrumentation extends Instrumentation {
         try {
             if ("gestures".equals(phase)) {
                 new GestureChecks(this).run();
-                report.putString("stream", "PASS: isolated gesture QA: history, header, two-step refresh, short/cancelled pulls, nested scrolling, horizontal widget, text input.\n");
+                report.putString("stream", "PASS: automatic content header; pinned login, Plus4U and blank pages; login/logout transitions; manual reveal retention; history, two-step refresh, cancelled pulls, nested scrolling and protected widgets.\n");
                 finish(Activity.RESULT_OK, report);
                 return;
             }
@@ -156,6 +156,7 @@ public class SmokeInstrumentation extends Instrumentation {
         runOnMainSync(() -> initialUrl.set(web.getUrl()));
         require(initialUrl.get() == null, "no school is loaded before selection");
         screenshot("04-school-setup.png");
+        runOnMainSync(() -> require(((BrowserGestureLayout) web.getParent().getParent()).isHeaderShown(), "school selection header visible"));
         runOnMainSync(() -> {
             android.widget.EditText input = activity.findViewById(R.id.school_subdomain);
             input.setText("school.edookit.net.evil.test");
@@ -168,6 +169,7 @@ public class SmokeInstrumentation extends Instrumentation {
         WebView first = web;
         openSchoolMenu();
         screenshot("05-switch-school.png");
+        runOnMainSync(() -> require(((BrowserGestureLayout) web.getParent().getParent()).isHeaderShown(), "switch-school header visible"));
         runOnMainSync(() -> activity.findViewById(R.id.cancel_school).performClick());
         require("zsslovanak".equals(savedSchool()), "cancel preserves selection");
         require(!visibleText(activity.getString(R.string.choose_school)), "cancel dismisses picker");

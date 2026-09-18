@@ -98,6 +98,8 @@ final class GestureChecks {
         check(main(chrome::isHeaderShown), "logout header stays pinned");
         js("document.querySelector('[data-name=Login]').remove()");
         waitFor(chrome::isHeaderHidden, "same-document login hides header");
+        js("document.body.innerHTML=''");
+        waitFor(chrome::isHeaderShown, "blank content keeps header available");
         test.runOnMainSync(() -> web.loadUrl("https://uuidentity.plus4u.net/uu-oidc-maing02/test"));
         waitFor(chrome::isHeaderShown, "Plus4U header visible");
         SystemClock.sleep(2200);
