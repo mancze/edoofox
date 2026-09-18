@@ -54,6 +54,22 @@ final class GestureChecks {
         test.runOnMainSync(() -> web.loadUrl("https://gesture-test.edookit.net/one"));
         waitFor(() -> web.getProgress() == 100 && web.getUrl().endsWith("/one"), "first fixture");
         waitFor(chrome::isHeaderHidden, "content automatically hides header without scrolling");
+        View menuButton = activity.findViewById(R.id.show_app_menu);
+        waitFor(menuButton::isShown, "fox shortcut visible at page top with hidden header");
+        screenshot("fox-menu-shortcut.png");
+        int loadsBeforeMenu = loads.get();
+        int[] buttonLocation = new int[2];
+        test.runOnMainSync(() -> {
+            menuButton.getLocationOnScreen(buttonLocation);
+            buttonLocation[0] += menuButton.getWidth() / 2;
+            buttonLocation[1] += menuButton.getHeight() / 2;
+        });
+        long tapTime = SystemClock.uptimeMillis();
+        send(tapTime, MotionEvent.ACTION_DOWN, buttonLocation[0], buttonLocation[1]);
+        send(tapTime, MotionEvent.ACTION_UP, buttonLocation[0], buttonLocation[1]);
+        waitFor(chrome::isHeaderShown, "fox tap reveals header");
+        check(!main(menuButton::isShown), "fox shortcut absent when header is shown");
+        check(loads.get() == loadsBeforeMenu, "fox tap does not navigate or refresh");
         test.runOnMainSync(() -> web.loadUrl("https://gesture-test.edookit.net/two"));
         waitFor(() -> web.getProgress() == 100 && web.getUrl().endsWith("/two"), "second fixture");
         swipe(.25f,.55f,.8f,.55f,false);
@@ -62,13 +78,15 @@ final class GestureChecks {
         waitFor(() -> web.getUrl().endsWith("/two"), "swipe Forward");
         swipe(.5f,.8f,.5f,.3f,false);
         waitFor(() -> chrome.isHeaderHidden(), "header hides");
+        check(!main(menuButton::isShown), "fox shortcut absent while document is scrolled");
         check(main(() -> ((View) web.getParent()).getTop() == 0), "no header gap");
         screenshot("gesture-hidden.png");
         test.runOnMainSync(() -> web.scrollTo(0,0));
-        SystemClock.sleep(500);
+        waitFor(menuButton::isShown, "fox shortcut returns after scrolling to top");
         int before = loads.get();
         swipe(.5f,.4f,.5f,.8f,false);
         waitFor(() -> chrome.isHeaderShown(), "first pull reveals header");
+        check(!main(menuButton::isShown), "pull reveal also hides fox shortcut");
         check(loads.get() == before, "first pull does not reload");
         SystemClock.sleep(2200);
         check(main(chrome::isHeaderShown), "periodic page checks leave manually revealed menu open");
@@ -94,6 +112,7 @@ final class GestureChecks {
         check(main(() -> web.getUrl().endsWith("/two")), "input does not navigate");
         js("document.body.innerHTML=\"<div data-name='Login'>Sign in again</div><div style='height:3000px'>Login fixture</div>\"");
         waitFor(chrome::isHeaderShown, "same-document logout reveals header");
+        check(!main(menuButton::isShown), "no fox shortcut on login page");
         swipe(.5f,.8f,.5f,.3f,false);
         check(main(chrome::isHeaderShown), "logout header stays pinned");
         js("document.querySelector('[data-name=Login]').remove()");

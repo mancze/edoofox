@@ -13,6 +13,7 @@ import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityManager;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import org.json.JSONObject;
 
@@ -24,6 +25,7 @@ public final class BrowserGestureLayout extends FrameLayout {
     private WebView web;
     private Runnable refresh;
     private final TextView feedback;
+    private final ImageButton menuButton;
     private final int barHeight;
     private final int slop;
     private float offset;
@@ -59,6 +61,22 @@ public final class BrowserGestureLayout extends FrameLayout {
         feedback.setBackground(background);
         feedback.setVisibility(GONE);
         feedback.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+        menuButton = new ImageButton(context);
+        menuButton.setId(R.id.show_app_menu);
+        menuButton.setImageResource(R.drawable.ic_fox);
+        menuButton.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        menuButton.setContentDescription(context.getString(R.string.show_app_menu));
+        menuButton.setTooltipText(context.getString(R.string.show_app_menu));
+        GradientDrawable circle = new GradientDrawable();
+        circle.setShape(GradientDrawable.OVAL);
+        circle.setColor(Color.WHITE);
+        circle.setStroke(dp(1), Color.rgb(226, 212, 240));
+        menuButton.setBackground(new android.graphics.drawable.RippleDrawable(
+                android.content.res.ColorStateList.valueOf(Color.argb(45, 103, 51, 156)), circle, null));
+        menuButton.setPadding(dp(10), dp(10), dp(10), dp(10));
+        menuButton.setElevation(dp(6));
+        menuButton.setVisibility(GONE);
+        menuButton.setOnClickListener(v -> { cancelGesture(); reveal(); });
     }
 
     public void setPanels(View toolbar, View page) {
@@ -69,11 +87,15 @@ public final class BrowserGestureLayout extends FrameLayout {
         addView(page, pageParams);
         addView(toolbar, new LayoutParams(-1, barHeight, Gravity.TOP));
         addView(feedback, new LayoutParams(-2, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL));
+        LayoutParams buttonParams = new LayoutParams(dp(56), dp(56), Gravity.BOTTOM | Gravity.END);
+        buttonParams.setMargins(dp(16), dp(16), dp(16), dp(16));
+        addView(menuButton, buttonParams);
     }
 
     public void attach(WebView view, Runnable refreshAction) {
         cancelGesture();
         web = view;
+        view.setOnScrollChangeListener((v, x, y, oldX, oldY) -> updateMenuButton());
         refresh = refreshAction;
         reveal();
     }
@@ -83,6 +105,7 @@ public final class BrowserGestureLayout extends FrameLayout {
         enabled = value;
         if (!value) { cancelGesture(); reveal(); }
         else if (changed) hideHeaderIfAllowed();
+        updateMenuButton();
     }
 
     public void setHeaderAutoHide(boolean value) {
@@ -99,7 +122,7 @@ public final class BrowserGestureLayout extends FrameLayout {
         if (autoHideHeader && usable() && !tracking) animateHeader(barHeight);
     }
 
-    public void setLoading(boolean value) { loading = value; }
+    public void setLoading(boolean value) { loading = value; updateMenuButton(); }
     public boolean isHeaderShown() { return offset < 1; }
     public boolean isHeaderHidden() { return offset >= barHeight - 1; }
     public void reveal() { animateHeader(0); }
@@ -111,7 +134,10 @@ public final class BrowserGestureLayout extends FrameLayout {
 
     @Override public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-            tracking = usable() && event.getY() >= page.getTop() && event.getY() < page.getBottom();
+            boolean touchingMenu = menuButton.isShown() && event.getX() >= menuButton.getLeft()
+                    && event.getX() <= menuButton.getRight() && event.getY() >= menuButton.getTop()
+                    && event.getY() <= menuButton.getBottom();
+            tracking = !touchingMenu && usable() && event.getY() >= page.getTop() && event.getY() < page.getBottom();
             mode = tracking ? Mode.UNDECIDED : Mode.IGNORE;
             sequence++;
             downX = event.getX(); downY = lastY = event.getY();
@@ -263,6 +289,15 @@ public final class BrowserGestureLayout extends FrameLayout {
         LayoutParams params = (LayoutParams) page.getLayoutParams();
         int margin = Math.round(barHeight - offset);
         if (params.topMargin != margin) { params.topMargin = margin; page.setLayoutParams(params); }
+        updateMenuButton();
+    }
+
+    private void updateMenuButton() {
+        // Leave the website's scroll-to-top control untouched. This shortcut only
+        // occupies the corner once the document has returned to the top.
+        boolean show = autoHideHeader && isHeaderHidden() && !loading && usable()
+                && web.getScrollY() == 0 && !web.canScrollVertically(-1);
+        menuButton.setVisibility(show ? VISIBLE : GONE);
     }
 
     private void probePage(float x, float y, int request) {
