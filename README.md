@@ -18,9 +18,9 @@ Renamed from Edoofox. The Android application ID remains `cz.weborama.edoofox` s
 - The header hides automatically once the selected school's content has settled, without needing a scroll. Login/Plus4U, school selection, and native error screens keep the header visible. A lightweight foreground-only check recognizes public login markers and authentication routes; this is a presentation heuristic, not proof of authentication. Blank/loading pages remain visible, and site layout changes may require detection updates.
 - Pulling downwards reveals the header; it stays open until scrolling away or navigating. At the top of the page, the first pull reveals a hidden header **without reloading**. Release, then pull again until “Release to refresh” appears to reload. A visible header permits refresh on the first pull. Short/cancelled pulls do nothing.
 - Horizontal scroll containers and editable fields retain their own gestures. Nested vertical scrolling is respected. Custom gestures are disabled while the keyboard or school chooser is open and during touch exploration (TalkBack); the header remains accessible. Error screens reveal the controls. Loading prevents duplicate pull-refreshes. System status/navigation bars remain visible.
-- Refresh button, school homepage, and open-in-browser menu.
+- Refresh button, **Edookit dashboard / Nástěnka Edookitu**, and open-in-browser menu. The dashboard opens the selected Edookit school root. No external school-homepage item is offered because its address is not known.
 - Page loading indicator and offline/server/certificate error screens with retry.
-- Czech and English native controls, following the device language.
+- Czech and English native controls selected by Android's standard ordered language preferences, including secondary preferences. Slovak resources use Czech wording; English is the fallback when no preferred locale matches. Android 13+ app-language settings offer Czech and English. No custom locale override is applied. This affects the native app UI, not Edookit webpage content or external Android apps.
 - Basic system file picker. Downloads are handed to the external browser and may require signing in there separately; protected downloads and camera capture are not verified.
 - No notifications, analytics, JavaScript/native bridge, or app-owned backend. Invalid certificates are rejected. Cleartext HTTP cannot load in the embedded view. App data backup is disabled.
 
@@ -37,7 +37,11 @@ Builds use the pinned Gradle 9.7.1 wrapper (distribution checksum verified) and 
 
 The installable development APK is `app/build/outputs/apk/debug/app-debug.apk`. It is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
 
-The current packaged build is `artifacts/Edoofox-0.3.1-debug.apk`.
+The current packaged build is `artifacts/Edoofox-0.3.2-debug.apk`.
+
+## Translations
+
+Native UI text is maintained in `app/src/main/res/values/strings.xml` (English fallback), `values-en/strings.xml` (explicit English preference matching), `values-cs/strings.xml` (Czech), and `values-sk/strings.xml` (the same Czech wording for Slovak preferences). Keep English/default and Czech/Slovak files synchronized, with matching resource keys and placeholders. Add UI labels through these resources rather than hardcoding them. The school-picker Cancel label follows the same resource matching. `xml/locales_config.xml` exposes the two translation choices in Android's app-language settings.
 
 ## Device smoke tests
 
@@ -49,6 +53,7 @@ $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
 & $adb -s emulator-5556 install -r app/build/outputs/apk/qa/app-qa.apk
 & $adb -s emulator-5556 install -r app/build/outputs/apk/androidTest/qa/app-qa-androidTest.apk
 & $adb -s emulator-5556 shell am instrument -w -e phase gestures cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
+& $adb -s emulator-5556 shell am instrument -w -e phase locales cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
 ```
 
 This checks actual touch swipes, history, automatic header hiding, pinned login/Plus4U headers, same-document login/logout transitions, manual reveal retention, two-step refresh, short/cancelled pulls, nested scrolling, horizontal widgets, and text fields. Do not combine `-Pqa` with the normal debug unit-test command.

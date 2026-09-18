@@ -1,5 +1,15 @@
 # Validation
 
+## Edoofox 0.3.2 — 2026-09-18
+
+- Uses Android's native ordered locale/resource matching, with no custom locale override. English/default and Czech/Slovak resource pairs provide the two UI translations. The standard API 33+ per-app language configuration lists Czech and English.
+- Dedicated API 36 QA emulator passed ten language-list configurations: Czech, Slovak, English, German, Arabic, and mixed preference lists. All app strings matched the expected translation, including secondary Czech/Slovak preferences and English taking precedence when ordered earlier. The packaged locale configuration was also checked.
+- Menu text now says Edookit dashboard / Nástěnka Edookitu and still opens the selected Edookit root. No unverified external school website entry was added.
+- Seven JVM tests passed; lint reported no issues. Two intentional manifest lint exceptions are documented inline: API 33-only language settings and Czech wording supplied under Slovak resources without advertising a third translation.
+- Debug APK and unsigned release AAB built; APK signature verified. No system-language settings or signed-in account data were changed. Full visual testing in every locale and language-split installation through Google Play remain untested.
+- Deliverables: `artifacts/Edoofox-0.3.2-debug.apk` and `artifacts/Edoofox-0.3.2-unsigned.aab`.
+- APK SHA-256: `fe6a32ab80e3ecca5e720151d4d04cb46d16c9d80c5ab1a9de1102ebfe5a1157`.
+
 ## Edoofox 0.3.1 — 2026-09-18
 
 - Header automatically hides on settled school content, while recognized public login/Plus4U pages keep it pinned. Detection uses a presentation-only, foreground-only boolean check, not credentials or an authentication guarantee. Public login selectors were verified against the school's signed-out HTML.
