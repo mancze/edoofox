@@ -41,6 +41,18 @@ The installable development APK is `app/build/outputs/apk/debug/app-debug.apk`. 
 
 The current packaged build is `artifacts/Edoofox-0.3.5-debug.apk`.
 
+For an installable personal release, configure the ignored `keystore.properties`
+file with the keystore path, alias, and passwords, then run:
+
+```powershell
+# Set JAVA_HOME to your Android Studio bundled Java runtime before building.
+.\gradlew.bat :app:assembleRelease
+```
+
+The signed APK is `app/build/outputs/apk/release/app-release.apk`. Back up the
+keystore and `keystore.properties` securely; future releases must use the same
+key to update an installed app.
+
 The **About / O aplikaci** menu entry opens a scrollable native dialog with the fox icon, app name, short description, build version, author Michal Novák, and **Project on GitHub / Projekt na GitHubu**. The GitHub button opens the external browser and temporarily targets `https://github.com/`; replace `PROJECT_URL` in `MainActivity.java` when the repository URL is provided. There is no separate GitHub menu item.
 
 ## Translations
@@ -88,7 +100,7 @@ Account-authenticated login, logout, and the actual school's session retention s
 
 ## Later Google Play publication
 
-The initial application ID is `cz.weborama.edoofox`; choose the final ID before first publication. An unsigned release bundle can be built with:
+The initial application ID is `cz.weborama.edoofox`; choose the final ID before first publication. A signed release bundle can be built with:
 
 ```powershell
 .\gradlew.bat :app:bundleRelease
@@ -96,4 +108,4 @@ The initial application ID is `cz.weborama.edoofox`; choose the final ID before 
 
 Output: `app/build/outputs/bundle/release/app-release.aab`.
 
-Before publication, use Android Studio's **Generate Signed App Bundle / APK** flow to create an upload key and signed release bundle. Back up the key securely; keys and signing configuration are ignored by Git. Then prepare the Play Console account, store listing, privacy disclosures, and required testing. Publication has not been performed, and the unsigned bundle is not ready to upload.
+Before publication, use Android Studio's **Generate Signed App Bundle / APK** flow if you need to select a different upload key. Back up the key securely; keys and signing configuration are ignored by Git. Then prepare the Play Console account, store listing, privacy disclosures, and required testing. Publication has not been performed.
