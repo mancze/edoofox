@@ -1,4 +1,5 @@
 <resources>
+    <item name="login_notice" type="id" />
     <item name="show_app_menu" type="id" />
     <item name="school_subdomain" type="id" />
     <item name="cancel_school" type="id" />

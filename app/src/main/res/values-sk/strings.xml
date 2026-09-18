@@ -1,5 +1,6 @@
 <!-- Keep in sync with values-cs/strings.xml. Native Android language-list matching; no locale override. -->
 <resources>
+    <string name="login_support_notice">V Edoofoxu se přihlaste k Plus4U e-mailem a heslem. Přihlášení přes Google, Microsoft, Apple a +4U Access tato aplikace zatím nepodporuje.</string>
     <string name="show_app_menu">Zobrazit nabídku aplikace</string>
     <string name="about">O aplikaci</string>
     <string name="about_slogan">Web Edookitu v jednoduché aplikaci pro Android.</string>

@@ -1,5 +1,13 @@
 # Validation
 
+## Edoofox 0.3.5 — 2026-09-18
+
+- Added Czech/English login guidance below recognized school-login and Plus4U pages: use Plus4U email/password; Google, Microsoft, Apple and +4U Access are not currently supported in Edoofox. The native notice does not cover the form, modify provider buttons, or change login routing.
+- Dedicated API 36 QA tests passed notice visibility on school login and Plus4U, disappearance on content/blank pages, return after same-document logout, and existing gesture/mascot regressions. The test explicitly waits for asynchronous page classification. The notice screenshot was visually reviewed on a local fixture.
+- All translation-resource checks and seven JVM tests passed; lint reported no issues; APK signature verified. Real credentials were not used. Physical-device keyboard/large-font layouts were not tested.
+- Deliverables: `artifacts/Edoofox-0.3.5-debug.apk` and `artifacts/Edoofox-0.3.5-unsigned.aab`.
+- APK SHA-256: `df5464fe0f898596e561712bc1c9c4d89062b79fbd94689b57a01b3de2679a2d`.
+
 ## Edoofox 0.3.4 — 2026-09-18
 
 - Replaced the direct GitHub menu entry with About / O aplikaci: fox icon, Edoofox, an honest website-wrapper slogan, current build version, author Michal Novák, and the external GitHub link. The URL remains the requested `https://github.com/` placeholder.

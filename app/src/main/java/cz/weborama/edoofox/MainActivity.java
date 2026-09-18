@@ -50,6 +50,8 @@ public class MainActivity extends Activity {
     private FrameLayout content;
     private BrowserGestureLayout chrome;
     private boolean keyboardVisible;
+    private TextView loginNotice;
+    private boolean loginPage;
     private final android.os.Handler headerHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private boolean resumed;
     private int pageGeneration;
@@ -63,12 +65,12 @@ public class MainActivity extends Activity {
     };
 
     // Presentation heuristic only, never an authentication/security decision. Return
-    // a boolean, not page text, credentials, cookies, or user identity. Unknown pages stay visible.
+    // a page category, not page text, credentials, cookies, or user identity. Unknown pages stay visible.
     private static final String SCHOOL_CONTENT = "(() => {"
-            + "if(document.readyState!=='complete'||!document.body) return false;"
-            + "if(/\\/user\\/(?:[^/]*(?:login|logout|password|register|callback))/i.test(location.pathname)) return false;"
-            + "if(document.querySelector('[data-name=Login],.login-page-container,.outside-page-container,input[type=password]')) return false;"
-            + "return document.body.innerText.trim().length>0;})()";
+            + "if(document.readyState!=='complete'||!document.body) return 'unknown';"
+            + "if(/\\/user\\/(?:[^/]*(?:login|logout|password|register|callback))/i.test(location.pathname)) return 'login';"
+            + "if(document.querySelector('[data-name=Login],.login-page-container,.outside-page-container,input[type=password]')) return 'login';"
+            + "return document.body.innerText.trim().length>0?'content':'unknown';})()";
     private android.widget.ScrollView schoolPanel;
     private android.widget.EditText schoolInput;
     private TextView schoolLabel;
@@ -220,6 +222,17 @@ public class MainActivity extends Activity {
         chrome = new BrowserGestureLayout(this);
         chrome.setPanels(toolbar, content);
         root.addView(chrome, new LinearLayout.LayoutParams(-1, 0, 1));
+        // Outside the WebView: never covers login controls or modifies the provider's page.
+        loginNotice = new TextView(this);
+        loginNotice.setId(R.id.login_notice);
+        loginNotice.setText(R.string.login_support_notice);
+        loginNotice.setTextSize(14);
+        loginNotice.setTextColor(PURPLE);
+        loginNotice.setBackgroundColor(Color.rgb(245, 239, 251));
+        loginNotice.setPadding(dp(16), dp(10), dp(16), dp(10));
+        loginNotice.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        loginNotice.setVisibility(View.GONE);
+        root.addView(loginNotice, new LinearLayout.LayoutParams(-1, -2));
         setContentView(root);
     }
 
@@ -289,6 +302,7 @@ public class MainActivity extends Activity {
         schoolInput.selectAll();
         schoolPanel.findViewById(R.id.cancel_school).setVisibility(school == null ? View.GONE : View.VISIBLE);
         schoolPanel.setVisibility(View.VISIBLE);
+        updateLoginNotice();
         updateGestures();
         refresh.setEnabled(false);
         more.setEnabled(false);
@@ -299,6 +313,7 @@ public class MainActivity extends Activity {
         android.view.inputmethod.InputMethodManager keyboard = getSystemService(android.view.inputmethod.InputMethodManager.class);
         keyboard.hideSoftInputFromWindow(schoolInput.getWindowToken(), 0);
         schoolPanel.setVisibility(View.GONE);
+        updateLoginNotice();
         updateGestures();
         refresh.setEnabled(true);
         more.setEnabled(true);
@@ -358,6 +373,8 @@ public class MainActivity extends Activity {
 
     @SuppressLint("SetJavaScriptEnabled")
     private void configureWebView() {
+        loginPage = false;
+        updateLoginNotice();
         pageGeneration++;
         contentSamples = 0;
         chrome.setHeaderAutoHide(false);
@@ -395,6 +412,8 @@ public class MainActivity extends Activity {
                 contentSamples = 0;
                 if (LinkPolicy.isAuthentication(url)) chrome.setHeaderAutoHide(false);
                 failed = false;
+                loginPage = LinkPolicy.isAuthentication(url);
+                updateLoginNotice();
                 chrome.setLoading(true);
                 updateGestures();
                 errorPanel.setVisibility(View.GONE);
@@ -521,6 +540,7 @@ public class MainActivity extends Activity {
 
     private void showError(int message) {
         failed = true;
+        updateLoginNotice();
         contentSamples = 0;
         chrome.setHeaderAutoHide(false);
         chrome.setLoading(false);
@@ -589,6 +609,8 @@ public class MainActivity extends Activity {
         WebView source = webView;
         String url = source.getUrl();
         if (failed || links == null || !links.isInternal(url)) {
+            loginPage = !failed && LinkPolicy.isAuthentication(url);
+            updateLoginNotice();
             contentSamples = 0;
             chrome.setHeaderAutoHide(false);
             return;
@@ -597,13 +619,20 @@ public class MainActivity extends Activity {
         source.evaluateJavascript(SCHOOL_CONTENT, result -> {
             if (!resumed || source != webView || generation != pageGeneration
                     || !java.util.Objects.equals(url, source.getUrl()) || failed) return;
-            if ("true".equals(result)) {
+            loginPage = "\"login\"".equals(result);
+            updateLoginNotice();
+            if ("\"content\"".equals(result)) {
                 if (contentSamples < 2 && ++contentSamples == 2) chrome.setHeaderAutoHide(true);
             } else {
                 contentSamples = 0;
                 chrome.setHeaderAutoHide(false);
             }
         });
+    }
+
+    private void updateLoginNotice() {
+        loginNotice.setVisibility(loginPage && school != null && !failed
+                && schoolPanel.getVisibility() != View.VISIBLE ? View.VISIBLE : View.GONE);
     }
 
     @Override protected void onDestroy() {

@@ -49,11 +49,15 @@ final class GestureChecks {
         waitFor(() -> web.getProgress() == 100 && web.getUrl().endsWith("/login"), "login fixture");
         SystemClock.sleep(2500);
         check(main(chrome::isHeaderShown), "signed-out header remains visible");
+        View notice = activity.findViewById(R.id.login_notice);
+        check(main(notice::isShown), "login support notice shown on school login");
+        screenshot("login-support-notice.png");
         swipe(.5f,.8f,.5f,.3f,false);
         check(main(chrome::isHeaderShown), "scrolling cannot hide login header");
         test.runOnMainSync(() -> web.loadUrl("https://gesture-test.edookit.net/one"));
         waitFor(() -> web.getProgress() == 100 && web.getUrl().endsWith("/one"), "first fixture");
         waitFor(chrome::isHeaderHidden, "content automatically hides header without scrolling");
+        check(!main(notice::isShown), "login notice hidden on school content");
         View menuButton = activity.findViewById(R.id.show_app_menu);
         waitFor(menuButton::isShown, "fox shortcut visible at page top with hidden header");
         screenshot("fox-menu-shortcut.png");
@@ -112,6 +116,7 @@ final class GestureChecks {
         check(main(() -> web.getUrl().endsWith("/two")), "input does not navigate");
         js("document.body.innerHTML=\"<div data-name='Login'>Sign in again</div><div style='height:3000px'>Login fixture</div>\"");
         waitFor(chrome::isHeaderShown, "same-document logout reveals header");
+        waitFor(notice::isShown, "notice returns on logout");
         check(!main(menuButton::isShown), "no fox shortcut on login page");
         swipe(.5f,.8f,.5f,.3f,false);
         check(main(chrome::isHeaderShown), "logout header stays pinned");
@@ -119,8 +124,10 @@ final class GestureChecks {
         waitFor(chrome::isHeaderHidden, "same-document login hides header");
         js("document.body.innerHTML=''");
         waitFor(chrome::isHeaderShown, "blank content keeps header available");
+        waitFor(() -> !notice.isShown(), "blank page is not treated as login");
         test.runOnMainSync(() -> web.loadUrl("https://uuidentity.plus4u.net/uu-oidc-maing02/test"));
         waitFor(chrome::isHeaderShown, "Plus4U header visible");
+        waitFor(notice::isShown, "notice visible during Plus4U authentication");
         SystemClock.sleep(2200);
         swipe(.5f,.8f,.5f,.3f,false);
         check(main(chrome::isHeaderShown), "Plus4U header stays visible");

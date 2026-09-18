@@ -1,4 +1,5 @@
 <resources>
+    <string name="login_support_notice">In Edoofox, sign in to Plus4U with your email and password. Google, Microsoft, Apple and +4U Access login are not currently supported in this app.</string>
     <string name="show_app_menu">Show app menu</string>
     <string name="about">About</string>
     <string name="about_slogan">Edookit’s website, in a simple Android app.</string>

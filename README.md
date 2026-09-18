@@ -13,6 +13,7 @@ Renamed from Edoofox. The Android application ID remains `cz.weborama.edoofox` s
 - Original purple fox vector icon, inspired by the reference's simple purple/white palette.
 - Only the selected school's pages stay inside the app. Other HTTP(S) websites, including other school subdomains, open in a browser; telephone and email links open their appropriate apps.
 - **Plus4U username/password sign-in only for this version.** The verified `uuidentity.plus4u.net` authentication paths stay inside the app so the login callback can return to the same session. The website may still advertise Google, Microsoft, Apple, and +4U Access; those methods are not supported by this version.
+- A Czech/English notice on recognized school-login and Plus4U screens tells users to use their Plus4U email/password and explains which other methods are unsupported in Edoofox. It sits outside the webpage, without covering or changing the login form, and disappears on school content, setup, and native errors. It does not disable the website's provider buttons or change authentication behavior.
 - Cookies and DOM storage are retained. Persistent cookies are flushed to disk when pages finish and the app pauses. Actual session lifetime and the “stay signed in” option are controlled by Edookit/Plus4U.
 - Swipe right within the page to go Back, or left to go Forward. Android's system-edge Back gesture stays unchanged. Back/Forward also appear in the menu.
 - The header hides automatically once the selected school's content has settled, without needing a scroll. Login/Plus4U, school selection, and native error screens keep the header visible. A lightweight foreground-only check recognizes public login markers and authentication routes; this is a presentation heuristic, not proof of authentication. Blank/loading pages remain visible, and site layout changes may require detection updates.
@@ -38,7 +39,7 @@ Builds use the pinned Gradle 9.7.1 wrapper (distribution checksum verified) and 
 
 The installable development APK is `app/build/outputs/apk/debug/app-debug.apk`. It is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
 
-The current packaged build is `artifacts/Edoofox-0.3.4-debug.apk`.
+The current packaged build is `artifacts/Edoofox-0.3.5-debug.apk`.
 
 The **About / O aplikaci** menu entry opens a scrollable native dialog with the fox icon, app name, short description, build version, author Michal Novák, and **Project on GitHub / Projekt na GitHubu**. The GitHub button opens the external browser and temporarily targets `https://github.com/`; replace `PROJECT_URL` in `MainActivity.java` when the repository URL is provided. There is no separate GitHub menu item.
 
