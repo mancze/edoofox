@@ -53,10 +53,20 @@ public class SmokeInstrumentation extends Instrumentation {
             if ("schools".equals(phase)) {
                 getTargetContext().getSharedPreferences("school", 0).edit().clear().commit();
             }
+            if ("about".equals(phase)) {
+                require(getTargetContext().getPackageName().endsWith(".qa"), "About checks require QA package");
+                getTargetContext().getSharedPreferences("school", 0).edit().putString("subdomain", "about-test").commit();
+            }
             activity = startActivitySync(new Intent(getTargetContext(), MainActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             runOnMainSync(() -> web = findWeb(activity.getWindow().getDecorView()));
             require(web != null, "WebView exists");
+            if ("about".equals(phase)) {
+                aboutChecks();
+                report.putString("stream", "PASS: About menu, name, slogan, version, author, external GitHub intent and dismissal.\n");
+                finish(Activity.RESULT_OK, report);
+                return;
+            }
             if ("schools".equals(phase)) {
                 schoolSelectionChecks();
                 report.putString("stream", "PASS: first-run chooser, validation, normalization, cancel, switching, history reset, old-school external routing.\n");
@@ -211,6 +221,11 @@ public class SmokeInstrumentation extends Instrumentation {
     }
 
     private void openSchoolMenu() throws Exception {
+        openMenuItem(R.string.switch_school);
+        await(() -> visibleText(activity.getString(R.string.choose_school)), "switch picker opened");
+    }
+
+    private void openMenuItem(int label) throws Exception {
         android.accessibilityservice.AccessibilityServiceInfo info = getUiAutomation().getServiceInfo();
         info.flags |= android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;
         getUiAutomation().setServiceInfo(info);
@@ -220,7 +235,7 @@ public class SmokeInstrumentation extends Instrumentation {
             for (android.view.accessibility.AccessibilityWindowInfo window : getUiAutomation().getWindows()) {
                 android.view.accessibility.AccessibilityNodeInfo root = window.getRoot();
                 if (root == null) continue;
-                java.util.List<android.view.accessibility.AccessibilityNodeInfo> items = root.findAccessibilityNodeInfosByText(activity.getString(R.string.switch_school));
+                java.util.List<android.view.accessibility.AccessibilityNodeInfo> items = root.findAccessibilityNodeInfosByText(activity.getString(label));
                 if (items.isEmpty()) continue;
                 android.graphics.Rect bounds = new android.graphics.Rect();
                 items.get(0).getBoundsInScreen(bounds);
@@ -235,8 +250,44 @@ public class SmokeInstrumentation extends Instrumentation {
                 return true;
             }
             return false;
-        }, "Switch school menu clicked");
-        await(() -> visibleText(activity.getString(R.string.choose_school)), "switch picker opened");
+        }, "Menu item clicked: " + activity.getString(label));
+    }
+
+    private void aboutChecks() throws Exception {
+        runOnMainSync(() -> { web.stopLoading(); web.getSettings().setBlockNetworkLoads(true); });
+        openMenuItem(R.string.about);
+        await(() -> {
+            AtomicReference<Boolean> showing = new AtomicReference<>(false);
+            runOnMainSync(() -> {
+                AboutDialog fragment = (AboutDialog) activity.getFragmentManager().findFragmentByTag(AboutDialog.TAG);
+                showing.set(fragment != null && fragment.getDialog() != null && fragment.getDialog().isShowing());
+            });
+            return showing.get();
+        }, "About dialog visible");
+        AtomicReference<android.app.AlertDialog> dialog = new AtomicReference<>();
+        runOnMainSync(() -> {
+            activity.getFragmentManager().executePendingTransactions();
+            AboutDialog fragment = (AboutDialog) activity.getFragmentManager().findFragmentByTag(AboutDialog.TAG);
+            require(fragment != null, "About dialog opened from menu");
+            dialog.set((android.app.AlertDialog) fragment.getDialog());
+            View root = dialog.get().getWindow().getDecorView();
+            for (String expected : new String[]{activity.getString(R.string.app_name), activity.getString(R.string.about_slogan),
+                    activity.getString(R.string.about_version, BuildConfig.VERSION_NAME), activity.getString(R.string.about_author, "Michal Novák")}) {
+                require(findText(root, expected), "About contains " + expected);
+            }
+        });
+        screenshot("about.png");
+        IntentFilter external = new IntentFilter(Intent.ACTION_VIEW);
+        external.addCategory(Intent.CATEGORY_BROWSABLE);
+        external.addDataScheme("https");
+        external.addDataAuthority("github.com", null);
+        ActivityMonitor monitor = addMonitor(external, new ActivityResult(Activity.RESULT_CANCELED, null), true);
+        runOnMainSync(() -> findButton(dialog.get().getWindow().getDecorView(), activity.getString(R.string.github_project)).performClick());
+        require(monitor.getHits() == 1, "GitHub opens externally");
+        removeMonitor(monitor);
+        runOnMainSync(() -> dialog.get().getButton(android.app.AlertDialog.BUTTON_POSITIVE).performClick());
+        waitForIdleSync();
+        require(!dialog.get().isShowing(), "Close dismisses About");
     }
 
     private View findDescription(View view, String text) {

@@ -1,4 +1,10 @@
 <resources>
+    <string name="about">About</string>
+    <string name="about_slogan">Edookit’s website, in a simple Android app.</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_author">Author: %1$s</string>
+    <string name="author_name" translatable="false">Michal Novák</string>
+    <string name="close">Close</string>
     <string name="github_project">Project on GitHub</string>
     <string name="app_name">Edoofox</string>
     <string name="choose_school">Choose your school</string>

@@ -156,13 +156,17 @@ public class MainActivity extends Activity {
             menu.getMenu().add(0, 3, 2, R.string.switch_school);
             menu.getMenu().add(0, 4, 3, R.string.gesture_back).setEnabled(webView.canGoBack());
             menu.getMenu().add(0, 5, 4, R.string.gesture_forward).setEnabled(webView.canGoForward());
-            menu.getMenu().add(0, 6, 5, R.string.github_project);
+            menu.getMenu().add(0, 6, 5, R.string.about);
             menu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 1) webView.loadUrl(home());
                 else if (item.getItemId() == 3) showSchoolPicker();
                 else if (item.getItemId() == 4) webView.goBack();
                 else if (item.getItemId() == 5) webView.goForward();
-                else if (item.getItemId() == 6) openExternal(PROJECT_URL);
+                else if (item.getItemId() == 6) {
+                    if (getFragmentManager().findFragmentByTag(AboutDialog.TAG) == null) {
+                        new AboutDialog().show(getFragmentManager(), AboutDialog.TAG);
+                    }
+                }
                 else openExternal(links.isInternal(webView.getUrl()) ? webView.getUrl() : home());
                 return true;
             });
@@ -493,6 +497,8 @@ public class MainActivity extends Activity {
         openExternal(url);
         return true;
     }
+
+    void openProjectPage() { openExternal(PROJECT_URL); }
 
     private void openExternal(String url) {
         if (!LinkPolicy.canOpenExternally(url)) {
