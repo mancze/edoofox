@@ -1,5 +1,6 @@
 <!-- Keep in sync with values/strings.xml. Native Android language-list matching; no locale override. -->
 <resources>
+    <string name="github_project">Project on GitHub</string>
     <string name="app_name">Edoofox</string>
     <string name="choose_school">Choose your school</string>
     <string name="switch_school">Switch school</string>

@@ -37,7 +37,9 @@ Builds use the pinned Gradle 9.7.1 wrapper (distribution checksum verified) and 
 
 The installable development APK is `app/build/outputs/apk/debug/app-debug.apk`. It is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
 
-The current packaged build is `artifacts/Edoofox-0.3.2-debug.apk`.
+The current packaged build is `artifacts/Edoofox-0.3.3-debug.apk`.
+
+The **Project on GitHub / Projekt na GitHubu** menu entry opens the external browser. It temporarily targets `https://github.com/`; replace `PROJECT_URL` in `MainActivity.java` when the repository URL is provided.
 
 ## Translations
 

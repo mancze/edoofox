@@ -36,6 +36,8 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
     private static final int PICK_FILES = 100;
+    // Replace with the project's repository URL when it is available.
+    private static final String PROJECT_URL = "https://github.com/";
     private static final int PURPLE = Color.rgb(103, 51, 156);
     private WebView webView;
     private ProgressBar progress;
@@ -154,11 +156,13 @@ public class MainActivity extends Activity {
             menu.getMenu().add(0, 3, 2, R.string.switch_school);
             menu.getMenu().add(0, 4, 3, R.string.gesture_back).setEnabled(webView.canGoBack());
             menu.getMenu().add(0, 5, 4, R.string.gesture_forward).setEnabled(webView.canGoForward());
+            menu.getMenu().add(0, 6, 5, R.string.github_project);
             menu.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 1) webView.loadUrl(home());
                 else if (item.getItemId() == 3) showSchoolPicker();
                 else if (item.getItemId() == 4) webView.goBack();
                 else if (item.getItemId() == 5) webView.goForward();
+                else if (item.getItemId() == 6) openExternal(PROJECT_URL);
                 else openExternal(links.isInternal(webView.getUrl()) ? webView.getUrl() : home());
                 return true;
             });

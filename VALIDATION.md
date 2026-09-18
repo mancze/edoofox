@@ -1,5 +1,12 @@
 # Validation
 
+## Edoofox 0.3.3 — 2026-09-18
+
+- Added Project on GitHub / Projekt na GitHubu to the menu. It uses the existing external-browser handler and temporarily points to `https://github.com/`; the repository URL is not yet supplied.
+- Seven JVM tests passed; lint reported no issues; English/default and Czech/Slovak translation pairs match. Debug APK and unsigned release AAB built; APK signature verified. No new emulator tap-through was performed for this small menu addition.
+- Deliverables: `artifacts/Edoofox-0.3.3-debug.apk` and `artifacts/Edoofox-0.3.3-unsigned.aab`.
+- APK SHA-256: `edea78661b8985b32c525842774bf909899a786d7662caf25fd9af38521dd0d7`.
+
 ## Edoofox 0.3.2 — 2026-09-18
 
 - Uses Android's native ordered locale/resource matching, with no custom locale override. English/default and Czech/Slovak resource pairs provide the two UI translations. The standard API 33+ per-app language configuration lists Czech and English.
