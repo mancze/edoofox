@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 18 68 68" width="108" height="108">
+  <title>Edoofox fox logo</title>
+  <!-- Same artwork as app/src/main/res/drawable/ic_fox.xml, with a tighter viewport for documentation. -->
+  <path fill="#67339C" d="M28,30 Q27,23 31,24 L46,35 Q54,32 62,35 L77,24 Q81,23 80,30 L78,55 Q74,73 54,82 Q34,73 30,55 Z" />
+  <path fill="#C9AFE2" d="M33,31 L42,38 L34,43 Z M75,31 L66,38 L74,43 Z" />
+  <path fill="#FFFFFF" d="M33,48 Q45,45 54,61 Q63,45 75,48 Q72,67 54,76 Q36,67 33,48 Z" />
+  <path stroke="#67339C" stroke-width="3" stroke-linecap="round" fill="none" d="M39,55 Q43,51 47,55 M61,55 Q65,51 69,55" />
+  <path fill="#67339C" d="M49,65 Q54,62 59,65 Q58,70 54,71 Q50,70 49,65 Z" />
+</svg>

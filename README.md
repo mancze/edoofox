@@ -1,4 +1,4 @@
-# Edoofox
+<h1><img src="docs/images/edoofox.svg" width="56" height="56" align="absmiddle" alt=""> Edoofox</h1>
 
 A small Android app that gives your school's Edookit website a home of its own.
 Choose your school, sign in, and keep school messages a tap away.
