@@ -85,6 +85,10 @@ cd edoofox
 On Windows, use `.\gradlew.bat`. Install the prerequisites first:
 [development guide](docs/DEVELOPMENT.md).
 
+GitHub CI checks builds, JVM unit tests, and lint. Emulator QA is local-only
+because of hosted-runner storage constraints; a green CI check does not certify
+on-device UI behavior. See [local QA](docs/DEVELOPMENT.md#local-only-isolated-qa).
+
 - [Signing and GitHub release setup](docs/SIGNING.md)
 - [Contributing and maintenance expectations](CONTRIBUTING.md)
 - [Reporting security issues privately](SECURITY.md)

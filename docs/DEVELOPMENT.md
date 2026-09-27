@@ -28,7 +28,12 @@ The production application ID and Java namespace are `cz.weborama.edoofox`.
 Keep this ID for future updates. Earlier development builds used a different
 ID; this branded app installs separately and does not migrate their data.
 
-## Isolated QA
+## Local-only isolated QA
+
+GitHub CI runs builds, JVM unit tests, and lint. It does not build or run the
+instrumentation QA suite. Hosted-runner storage constraints prevented reliable
+emulator startup, so emulator QA is deliberately excluded from GitHub Actions.
+A green CI result does not verify gestures or other on-device UI behavior.
 
 Use a separate emulator and the `.qa` variant. No production app data or real
 school credentials should be used. SDK API 36 is the tested emulator target.
@@ -48,9 +53,16 @@ debug unit-test command separately without it. The gesture suite uses local
 HTML fixtures; these tests do not log in to a real school.
 
 The custom instrumentation reports `PASS:`, `FAIL:`, or a process crash.
-Do not rely only on adb's exit code: CI uses `scripts/run-qa.sh` to require an
-explicit PASS and reject failures. Other historical smoke phases contact live
-school pages; they are not part of CI and must not run against a real session.
+Do not rely only on adb's exit code: the local `scripts/run-qa.sh` helper requires
+an explicit PASS and rejects failures. With a dedicated emulator already booted,
+`adb` on PATH, and exactly one current QA APK in the output directory, run:
+
+```sh
+ANDROID_SERIAL=YOUR_QA_SERIAL bash scripts/run-qa.sh
+```
+
+Use Bash (Git Bash on Windows) for this helper. Other historical smoke phases
+contact live school pages and must not run against a real session.
 
 ## Code and translations
 

@@ -1,5 +1,10 @@
 # Pre-publication review
 
+Current CI scope: emulator QA was subsequently removed from GitHub Actions due
+to hosted-runner storage constraints. Only build/unit-test/lint CI and the draft
+release workflow remain. Instrumentation QA is local-only; the checks below
+record the earlier review, including the former three-workflow configuration.
+
 Reviewed locally on 2026-09-27, starting from `8c320c2` (16 reachable commits).
 This is a repository-readiness review, not a penetration test or a guarantee
 that no unknown secret exists.

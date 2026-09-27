@@ -1,5 +1,12 @@
 # Validation
 
+## GitHub QA scope decision — 2026-09-27
+
+- Removed the emulator workflow and instrumentation APK compilation from GitHub CI because hosted-runner storage prevented emulator startup. CI covers debug/unsigned release builds, JVM unit tests, and lint only.
+- Retained the isolated `.qa` variant, instrumentation tests, and local QA script. Gesture, locale, and About checks passed locally on the API 36 Google ATD image; this does not constitute a successful GitHub emulator run.
+- The emulator enforces a 6 GiB data partition despite a requested 2 GiB; reducing the setting did not resolve the hosted-runner failure. Local ATD testing reduced system-image storage but did not remove that minimum.
+- Earlier entries describe historical checks and workflow configurations, not the current GitHub QA coverage.
+
 ## Edoofox 0.3.11 — Weborama application identity, 2026-09-27
 
 - Application ID, namespace, Java source packages, and instrumentation runner now use `cz.weborama.edoofox`; QA uses the `.qa` suffix. This installs separately from earlier development builds, without migrating their data.

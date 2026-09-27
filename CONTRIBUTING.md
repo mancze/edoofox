@@ -28,8 +28,10 @@ unredacted school screenshots. Follow [SECURITY.md](SECURITY.md) for vulnerabili
 1. Fork the repository and work on a branch.
 2. Follow [the development guide](docs/DEVELOPMENT.md); keep commits focused.
 3. Run the build, unit tests, and lint. For gesture/menu changes, run the relevant
-   QA checks on a separate emulator using the `.qa` app.
+   QA checks locally on a separate emulator using the `.qa` app. GitHub CI does
+   not build or run emulator QA because of hosted-runner storage constraints.
 4. Explain the problem, the resulting behavior, and what you tested in your PR.
+   For UI changes, include local QA results or explicitly state that it was not run.
    Small UI changes benefit from screenshots with fictional data.
 5. Keep English/default and Czech/Slovak string pairs synchronized.
 6. Do not commit APKs, signing material, local SDK paths, or emulator files.

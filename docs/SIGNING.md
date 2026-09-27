@@ -92,11 +92,13 @@ storage provides the encryption.
 
 ## Prepared workflows
 
-- `ci.yml`: credential-free build, unit tests, lint, unsigned release and QA-test
-  compilation on PRs/pushes; no signing or publication.
-- `qa.yml`: manual emulator gesture, locale, and About checks using only `.qa`.
+- `ci.yml`: credential-free builds, JVM unit tests, lint, and unsigned release
+  on PRs/pushes; no signing, publication, or instrumentation QA.
 - `release.yml`: manual, main-only, builds an unsigned APK, signs on a separate
   runner after environment approval, then creates a **draft** GitHub Release.
+
+Emulator QA is local-only because of hosted-runner storage constraints; there
+is no GitHub emulator workflow. See [local QA instructions](DEVELOPMENT.md#local-only-isolated-qa).
 
 The signing job does not check out the repository, execute Gradle, restore a
 Gradle cache, or receive a write-capable repository token. It downloads only the
@@ -112,7 +114,8 @@ unexpected environment request. Local signing remains a supported alternative.
 ## Make a GitHub release
 
 1. Merge reviewed changes into `main`, increment `versionCode` and `versionName`,
-   and check CI. Use SSH for Git:
+   and check CI. Run relevant local QA for UI/gesture changes; CI does not cover
+   emulator behavior. Use SSH for Git:
    `git remote set-url origin git@github.com:mancze/edoofox.git`.
 2. Tag the exact current main commit, for example `v0.3.10`, and push that tag.
    The workflow checks that the tag points to its selected main commit and
