@@ -1,121 +1,100 @@
 # Edoofox
 
-A small native Android app for a user-selected school at `https://<subdomain>.edookit.net/`. Java + Android WebView, with no third-party runtime libraries.
+A small Android app that gives your school's Edookit website a home of its own.
+Choose your school, sign in, and keep school messages a tap away.
 
-Renamed from Edoofox. The Android application ID remains `cz.weborama.edoofox` so the renamed APK can update an existing installation and retain its app data.
+**Edoofox is an independent, unofficial client. It is not affiliated with,
+endorsed by, or supported by Edookit or Plus4U.** It displays their website;
+it does not replace their service.
 
-## Current scope
+## Why another little app?
 
-- Android 8.0 (API 26) and later.
-- First launch asks for the school subdomain (for example, `zsslovanak`). The selection is stored on the device across launches and updates. Upgrading from the fixed-school version also prompts once; existing cookies are retained.
-- **More options → Switch school** changes the saved school. Cancel keeps the current page. Switching starts fresh navigation history, so Back cannot return to the previous school's pages. The current school appears below the app name.
-- Enter only one DNS label: 1–63 ASCII letters/numbers, with hyphens allowed inside the name. Input is trimmed and lowercased; full URLs, dots, and invalid characters are rejected. Availability is checked by loading the school page; use Switch school again if the subdomain does not exist.
-- Original purple fox vector icon, inspired by the reference's simple purple/white palette.
-- Only the selected school's pages stay inside the app. Other HTTP(S) websites, including other school subdomains, open in a browser; telephone and email links open their appropriate apps.
-- **Plus4U username/password sign-in only for this version.** The verified `uuidentity.plus4u.net` authentication paths stay inside the app so the login callback can return to the same session. The website may still advertise Google, Microsoft, Apple, and +4U Access; those methods are not supported by this version.
-- A Czech/English notice on recognized school-login and Plus4U screens tells users to use their Plus4U email/password and explains which other methods are unsupported in Edoofox. It sits outside the webpage, without covering or changing the login form, and disappears on school content, setup, and native errors. It does not disable the website's provider buttons or change authentication behavior.
-- Cookies and DOM storage are retained. Persistent cookies are flushed to disk when pages finish and the app pauses. Actual session lifetime and the “stay signed in” option are controlled by Edookit/Plus4U.
-- Swipe right within the page to go Back, or left to go Forward. Android's system-edge Back gesture stays unchanged. Back/Forward also appear in the menu.
-- The header hides automatically once the selected school's content has settled, without needing a scroll. Login/Plus4U, school selection, and native error screens keep the header visible. A lightweight foreground-only check recognizes public login markers and authentication routes; this is a presentation heuristic, not proof of authentication. Blank/loading pages remain visible, and site layout changes may require detection updates.
-- A downward gesture begun below the top scrolls the page back to the top without revealing the header. Only a new pull begun while the page is already at the top reveals the hidden header; it stays open until scrolling away or navigating. Release, then pull again until “Release to refresh” appears to reload. A visible header permits refresh on the first pull. Short/cancelled pulls do nothing.
-- At the top of the document, a floating fox button appears when the header is fully hidden. Tap it to reveal the header without navigating or reloading. It disappears while scrolling, loading, or showing the header. The website's own scroll-to-top control is left unchanged.
-- Horizontal scroll containers and editable fields retain their own gestures. Nested vertical scrolling is respected. Custom gestures are disabled while the keyboard or school chooser is open and during touch exploration (TalkBack); the header remains accessible. Error screens reveal the controls. Loading prevents duplicate pull-refreshes. System status/navigation bars remain visible.
-- Refresh button, **Edookit dashboard / Nástěnka Edookitu**, and open-in-browser menu. The dashboard opens the selected Edookit school root. No external school-homepage item is offered because its address is not known.
-- Page loading indicator and offline/server/certificate error screens with retry.
-- Czech and English native controls selected by Android's standard ordered language preferences, including secondary preferences. Slovak resources use Czech wording; English is the fallback when no preferred locale matches. Android 13+ app-language settings offer Czech and English. No custom locale override is applied. This affects the native app UI, not Edookit webpage content or external Android apps.
-- Basic system file picker. Downloads are handed to the external browser and may require signing in there separately; protected downloads and camera capture are not verified.
-- No notifications, analytics, JavaScript/native bridge, or app-owned backend. Invalid certificates are rejected. Cleartext HTTP cannot load in the embedded view. App data backup is disabled.
+Dear Edookit, from one mildly outnumbered parent: please give us an official
+Android app we can allow in Google Family Link. I would love to say
+"yes to homework" without turning that into "yes to the entire browser."
+Surely the school timetable can have its own little permission slip?
 
-## Build
+Until then, this fox is my homemade attempt: put the school website in a
+separate app so a parent can try managing its availability alongside the
+child's other apps. Built with affection, a little parental pleading, and
+the hope that Edookit will eventually make it unnecessary.
 
-Open this directory in Android Studio and let Gradle sync. Use the bundled Java runtime and install Android SDK Platform 37 and Build Tools 36.0.0. `local.properties` holds the machine-specific SDK path and is ignored by Git.
+The happiest ending for Edoofox is retirement: an official client that meets
+this need would be a very welcome reason to deprecate it.
 
-Builds use the pinned Gradle 9.7.1 wrapper (distribution checksum verified) and Android Gradle Plugin 9.4.0. Gradle 9.7.1 supports the Java 25 runtime bundled with the installed Android Studio.
+**This is a motivation, not a parental-control guarantee.** Edoofox does not
+integrate with Family Link or bypass its restrictions. Installation and app
+controls depend on the device and family settings. External links and downloads
+can open other apps, which need their own parental controls.
 
-```powershell
-# Set JAVA_HOME to your Android Studio bundled Java runtime before building.
-.\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+## What it does
+
+- Android 8.0 and newer; native Java UI with an Android WebView.
+- Select a school's Edookit subdomain and switch schools from the menu.
+- Sign in with **Plus4U email and password**. Google, Microsoft, Apple, and
+  +4U Access sign-in are not currently supported in the app.
+- Remember the school and browser session, subject to the website's own
+  session-expiry rules.
+- A compact menu with icons and Navigation, Page, and App groups.
+- Back/Forward swipes, a fox shortcut to the menu, and deliberate pull-to-refresh.
+  Normal scrolling never reveals the menu. Pull down starting at the top to
+  reveal it; with the menu already open, a longer pull can refresh.
+- Czech and English UI; Slovak devices use the Czech translation.
+- No app-owned backend or analytics.
+
+Notifications are not implemented. Downloads open in an external browser;
+protected downloads and camera uploads are not verified. Website changes can
+affect login and gesture behavior. See [privacy and limitations](docs/PRIVACY.md).
+
+<img src="docs/images/about.png" width="280" alt="Edoofox About screen with its unofficial-client notice" />
+
+Screenshot from the isolated QA app using a fictional school; no account data.
+
+## Install
+
+Official APKs are intended to be distributed through
+[GitHub Releases](https://github.com/mancze/edoofox/releases). If there is no
+release yet, build from source or wait for the first published APK.
+
+1. Download the versioned `edoofox-<version>-release.apk` release asset.
+2. Open it on your phone and, if prompted, allow installation from that source.
+3. Choose your school's subdomain and sign in using Plus4U email and password.
+
+A supervised phone may require a parent's approval or may block sideloading.
+Check the device's own controls; Edoofox cannot override them.
+
+Install future official releases over the existing app to retain local data.
+Updates must use the same signing key. A debug build or independently signed
+fork cannot replace an official release with the same application ID.
+Uninstalling removes locally stored settings and sessions.
+
+The application ID remains `cz.weborama.edoofox` for update compatibility,
+following the rename from Edoofox.
+
+## Build and contribute
+
+No signing secrets or school account are needed to build the app.
+
+```sh
+git clone git@github.com:mancze/edoofox.git
+cd edoofox
+./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-Build APKs follow `edoofox-<version>-<build-type>.apk`, for example `edoofox-0.3.6-debug.apk`. The installable development APK is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
+On Windows, use `.\gradlew.bat`. Install the prerequisites first:
+[development guide](docs/DEVELOPMENT.md).
 
-The current packaged build is `artifacts/Edoofox-0.3.6-debug.apk`.
+- [Signing and GitHub release setup](docs/SIGNING.md)
+- [Contributing and maintenance expectations](CONTRIBUTING.md)
+- [Reporting security issues privately](SECURITY.md)
+- [Publication audit](docs/PUBLICATION-AUDIT.md)
+- [Historical validation notes](VALIDATION.md)
 
-For an installable personal release, configure the ignored `keystore.properties`
-file with the keystore path, alias, and passwords, then run:
+This is a spare-time parent project: small fixes are welcome, response times
+are unpredictable, and there is no support SLA.
 
-```powershell
-# Set JAVA_HOME to your Android Studio bundled Java runtime before building.
-.\gradlew.bat :app:assembleRelease
-```
+## License
 
-The signed APK is `app/build/outputs/apk/release/edoofox-0.3.9-release.apk`. Back up the
-keystore and `keystore.properties` securely; future releases must use the same
-key to update an installed app.
-
-Normal scrolling can hide the app menu but never reveals it. A downward pull
-must start at the top to reveal it. Refresh requires the menu to be fully open
-before the gesture starts, a pull of at least 180dp, and release after the
-“Release to refresh” feedback appears. Reversing below the threshold or
-cancelling the gesture prevents refresh; revealing the menu never refreshes.
-
-The app menu shows an icon for every action, with labeled groups and dividers:
-Navigation (Dashboard, Back, Forward), Page (Refresh, Open in browser), and
-App (Switch school, About). Unavailable navigation actions are disabled.
-
-The **About / O aplikaci** menu entry opens a scrollable native dialog with the fox icon, app name, short description, build version, author Michal Novák, and **Project on GitHub / Projekt na GitHubu**. The GitHub button opens the external browser and temporarily targets `https://github.com/`; replace `PROJECT_URL` in `MainActivity.java` when the repository URL is provided. There is no separate GitHub menu item.
-
-## Translations
-
-Native UI text is maintained in `app/src/main/res/values/strings.xml` (English fallback), `values-en/strings.xml` (explicit English preference matching), `values-cs/strings.xml` (Czech), and `values-sk/strings.xml` (the same Czech wording for Slovak preferences). Keep English/default and Czech/Slovak files synchronized, with matching resource keys and placeholders. Add UI labels through these resources rather than hardcoding them. The school-picker Cancel label follows the same resource matching. `xml/locales_config.xml` exposes the two translation choices in Android's app-language settings.
-
-## Device smoke tests
-
-Gesture tests use a separate `.qa` application ID and locally intercepted HTML pages, never the normal app's signed-in browser storage:
-
-```powershell
-.\gradlew.bat -Pqa :app:assembleQa :app:assembleQaAndroidTest
-$adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb -s emulator-5556 install -r app/build/outputs/apk/qa/edoofox-0.3.6-qa.apk
-& $adb -s emulator-5556 install -r app/build/outputs/apk/androidTest/qa/app-qa-androidTest.apk
-& $adb -s emulator-5556 shell am instrument -w -e phase gestures cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
-& $adb -s emulator-5556 shell am instrument -w -e phase locales cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
-& $adb -s emulator-5556 shell am instrument -w -e phase about cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
-```
-
-This checks actual touch swipes, history, automatic header hiding, pinned login/Plus4U headers, same-document login/logout transitions, manual reveal retention, two-step refresh, short/cancelled pulls, nested scrolling, horizontal widgets, and text fields. Do not combine `-Pqa` with the normal debug unit-test command.
-
-Use an isolated emulator, without a real signed-in account. The tests navigate the public school/Plus4U pages, load test-only HTML, temporarily block WebView network loads to test retry, and create then remove a synthetic cookie. No credentials are entered.
-
-```powershell
-.\gradlew.bat :app:assembleDebug :app:assembleDebugAndroidTest
-$adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb -s emulator-5556 install -r app/build/outputs/apk/debug/edoofox-0.3.6-debug.apk
-& $adb -s emulator-5556 install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-& $adb -s emulator-5556 shell am instrument -w -e phase schools cz.weborama.edoofox.test/cz.weborama.edoofox.SmokeInstrumentation
-& $adb -s emulator-5556 shell am force-stop cz.weborama.edoofox
-& $adb -s emulator-5556 shell am instrument -w -e phase verify-school cz.weborama.edoofox.test/cz.weborama.edoofox.SmokeInstrumentation
-& $adb -s emulator-5556 shell am instrument -w cz.weborama.edoofox.test/cz.weborama.edoofox.SmokeInstrumentation
-& $adb -s emulator-5556 shell am force-stop cz.weborama.edoofox
-& $adb -s emulator-5556 shell am instrument -w -e phase verify-cookie cz.weborama.edoofox.test/cz.weborama.edoofox.SmokeInstrumentation
-```
-
-The custom instrumentation prints `PASS` or `FAIL`. Screenshots are written to the test app's external files directory under `smoke/`. Unit tests exercise exact-origin matching, deceptive hosts, allowed external schemes, and the narrow authentication exception.
-
-If a school home page is already signed in, the public-login regression phase prints `SKIP` and leaves that session intact. Use a fresh emulator for the full signed-out regression suite. Automatic failure screenshots are disabled to avoid capturing account content.
-
-The `schools` phase resets only the test emulator's saved school preference, then checks first launch, invalid input, normalization, cancel, switching, cleared history, and routing to a previous school. The `verify-school` phase checks persistence after a process restart and selects `zsslovanak` for the public-login tests. School selection survives without a network connection; it does not guarantee that an entered school exists or uses the same sign-in provider.
-
-Account-authenticated login, logout, and the actual school's session retention still need a device test with the user's own Plus4U account. Credentials should be entered only into the Plus4U page by the user.
-
-## Later Google Play publication
-
-The initial application ID is `cz.weborama.edoofox`; choose the final ID before first publication. A signed release bundle can be built with:
-
-```powershell
-.\gradlew.bat :app:bundleRelease
-```
-
-Output: `app/build/outputs/bundle/release/app-release.aab`.
-
-Before publication, use Android Studio's **Generate Signed App Bundle / APK** flow if you need to select a different upload key. Back up the key securely; keys and signing configuration are ignored by Git. Then prepare the Play Console account, store listing, privacy disclosures, and required testing. Publication has not been performed.
+Edoofox's original code and artwork are provided under the [MIT license](LICENSE).
+Third-party tools retain their own licenses. Edookit/Plus4U names, services, and
+web content are not licensed by this repository; see [notices](NOTICE.md).

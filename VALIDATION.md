@@ -1,5 +1,12 @@
 # Validation
 
+## Edoofox 0.3.10 — open-source preparation, 2026-09-27
+
+- Clean-clone debug build, unit tests, lint, and unsigned release build passed without signing files. Explicit required-signing mode rejected missing credentials.
+- Unofficial-client notice and actual GitHub URL verified by QA About tests; gesture and localization checks passed through the CI QA script on isolated API 36.
+- Signed release verified against the existing certificate. Workflow syntax checked with Actionlint; CI-style signing tested with a disposable key. GitHub-hosted workflows remain unrun until publication/setup.
+- MIT license, public docs, privacy/security/contribution policies, and history review added. No production secrets uploaded; see `docs/PUBLICATION-AUDIT.md` for scope and findings.
+
 ## Edoofox 0.3.5 — 2026-09-18
 
 - Added Czech/English login guidance below recognized school-login and Plus4U pages: use Plus4U email/password; Google, Microsoft, Apple and +4U Access are not currently supported in Edoofox. The native notice does not cover the form, modify provider buttons, or change login routing.
