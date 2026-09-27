@@ -85,10 +85,14 @@ final class GestureChecks {
         check(!main(menuButton::isShown), "fox shortcut absent while document is scrolled");
         check(main(() -> ((View) web.getParent()).getTop() == 0), "no header gap");
         screenshot("gesture-hidden.png");
-        test.runOnMainSync(() -> web.scrollTo(0,320));
-        waitFor(() -> main(() -> web.canScrollVertically(-1)), "document starts below top");
+        test.runOnMainSync(() -> web.scrollTo(0,2000));
         swipe(.5f,.4f,.5f,.8f,false);
-        waitFor(() -> main(() -> !web.canScrollVertically(-1)), "first downward pull reaches page top");
+        check(main(() -> web.canScrollVertically(-1)), "document still below top");
+        check(main(chrome::isHeaderHidden), "normal downward scrolling never reveals header");
+        test.runOnMainSync(() -> web.scrollTo(0,320));
+        waitFor(() -> web.canScrollVertically(-1), "document starts below top");
+        swipe(.5f,.4f,.5f,.8f,false);
+        waitFor(() -> !web.canScrollVertically(-1), "first downward pull reaches page top");
         check(main(chrome::isHeaderHidden), "pull that started below top does not reveal header");
         waitFor(menuButton::isShown, "fox shortcut returns after scrolling to top");
         int before = loads.get();
@@ -100,6 +104,8 @@ final class GestureChecks {
         check(main(chrome::isHeaderShown), "periodic page checks leave manually revealed menu open");
         swipe(.5f,.4f,.5f,.47f,false);
         check(loads.get() == before, "short pull does not reload");
+        swipePixels(150,250,150,400,false);
+        check(loads.get() == before, "150dp pull does not accidentally refresh");
         swipe(.5f,.4f,.5f,.8f,true);
         check(loads.get() == before, "cancel does not reload");
         swipe(.5f,.4f,.5f,.8f,false);

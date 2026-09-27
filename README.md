@@ -49,9 +49,15 @@ file with the keystore path, alias, and passwords, then run:
 .\gradlew.bat :app:assembleRelease
 ```
 
-The signed APK is `app/build/outputs/apk/release/edoofox-0.3.6-release.apk`. Back up the
+The signed APK is `app/build/outputs/apk/release/edoofox-0.3.8-release.apk`. Back up the
 keystore and `keystore.properties` securely; future releases must use the same
 key to update an installed app.
+
+Normal scrolling can hide the app menu but never reveals it. A downward pull
+must start at the top to reveal it. Refresh requires the menu to be fully open
+before the gesture starts, a pull of at least 180dp, and release after the
+“Release to refresh” feedback appears. Reversing below the threshold or
+cancelling the gesture prevents refresh; revealing the menu never refreshes.
 
 The **About / O aplikaci** menu entry opens a scrollable native dialog with the fox icon, app name, short description, build version, author Michal Novák, and **Project on GitHub / Projekt na GitHubu**. The GitHub button opens the external browser and temporarily targets `https://github.com/`; replace `PROJECT_URL` in `MainActivity.java` when the repository URL is provided. There is no separate GitHub menu item.
 

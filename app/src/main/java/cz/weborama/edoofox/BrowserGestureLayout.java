@@ -143,7 +143,7 @@ public final class BrowserGestureLayout extends FrameLayout {
             downX = event.getX(); downY = lastY = event.getY();
             downTime = SystemClock.uptimeMillis();
             startOffset = offset;
-            pageAtTopOnDown = !web.canScrollVertically(-1);
+            pageAtTopOnDown = web != null && !web.canScrollVertically(-1);
             refreshOnThisPull = isHeaderShown() && !loading;
             thresholdReached = false;
             probed = false;
@@ -189,7 +189,8 @@ public final class BrowserGestureLayout extends FrameLayout {
         }
         if (mode == Mode.SCROLL) {
             if (canScrollDown || canScrollUp || web.canScrollVertically(1) || web.canScrollVertically(-1) || dy > 0) {
-                setHeaderOffset(offset - (event.getY() - lastY));
+                // Ordinary page scrolling may hide controls, but must never reveal them.
+                setHeaderOffset(offset + Math.max(0, lastY - event.getY()));
             }
             lastY = event.getY();
         }
@@ -205,11 +206,11 @@ public final class BrowserGestureLayout extends FrameLayout {
             if (mode == Mode.PULL) {
                 distance = Math.max(0, event.getY() - downY);
                 if (refreshOnThisPull) {
-                    float progress = Math.min(1, distance / dp(120));
+                    float progress = Math.min(1, distance / dp(180));
                     page.setTranslationY(Math.min(dp(56), distance * .3f));
-                    showFeedback(distance >= dp(120) ? R.string.release_refresh : R.string.pull_refresh,
+                    showFeedback(distance >= dp(180) ? R.string.release_refresh : R.string.pull_refresh,
                             Gravity.TOP | Gravity.CENTER_HORIZONTAL, progress);
-                    notifyThreshold(distance >= dp(120));
+                    notifyThreshold(distance >= dp(180));
                 } else {
                     setHeaderOffset(startOffset - distance * .75f);
                 }
@@ -228,7 +229,7 @@ public final class BrowserGestureLayout extends FrameLayout {
                     : (event.getX() - downX) * -historyDirection;
             if (mode == Mode.PULL) {
                 if (refreshOnThisPull) {
-                    if (released && distance >= dp(120) && !loading && usable()) refresh.run();
+                    if (released && thresholdReached && distance >= dp(180) && !loading && usable()) refresh.run();
                 } else animateHeader(released && distance >= dp(28) ? 0 : startOffset);
             } else if (released && distance >= historyThreshold() && usable() && web.canGoBackOrForward(historyDirection)) {
                 web.goBackOrForward(historyDirection);
