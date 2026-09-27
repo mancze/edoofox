@@ -45,6 +45,10 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
+          # Local-fixture QA needs little app storage; the profile default can
+          # exceed the free disk space on a hosted runner and prevent boot.
+          disk-size: 2G
+          pre-emulator-launch-script: df -h "$HOME/.android/avd"
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
           script: bash scripts/run-qa.sh
