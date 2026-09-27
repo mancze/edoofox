@@ -23,7 +23,10 @@
     <string name="gesture_back">Zpět</string>
     <string name="gesture_forward">Vpřed</string>
     <string name="more">Další možnosti</string>
-    <string name="dashboard">Nástěnka Edookitu</string>
+    <string name="dashboard">Nástěnka</string>
+    <string name="menu_navigation">Navigace</string>
+    <string name="menu_page">Stránka</string>
+    <string name="menu_app">Aplikace</string>
     <string name="cancel">Zrušit</string>
     <string name="open_browser">Otevřít v prohlížeči</string>
     <string name="loading">Načítání Edookitu…</string>

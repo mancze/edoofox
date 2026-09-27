@@ -236,6 +236,7 @@ public class SmokeInstrumentation extends Instrumentation {
                 android.view.accessibility.AccessibilityNodeInfo root = window.getRoot();
                 if (root == null) continue;
                 java.util.List<android.view.accessibility.AccessibilityNodeInfo> items = root.findAccessibilityNodeInfosByText(activity.getString(label));
+                items.removeIf(node -> !activity.getString(label).contentEquals(node.getText() == null ? "" : node.getText()));
                 if (items.isEmpty()) continue;
                 android.graphics.Rect bounds = new android.graphics.Rect();
                 items.get(0).getBoundsInScreen(bounds);

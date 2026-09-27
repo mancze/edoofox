@@ -29,7 +29,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -152,27 +151,23 @@ public class MainActivity extends Activity {
         toolbar.addView(refresh, new LinearLayout.LayoutParams(dp(48), dp(48)));
         more = iconButton(R.drawable.ic_more, R.string.more);
         more.setOnClickListener(v -> {
-            PopupMenu menu = new PopupMenu(this, more);
-            menu.getMenu().add(0, 1, 0, R.string.dashboard);
-            menu.getMenu().add(0, 2, 1, R.string.open_browser);
-            menu.getMenu().add(0, 3, 2, R.string.switch_school);
-            menu.getMenu().add(0, 4, 3, R.string.gesture_back).setEnabled(webView.canGoBack());
-            menu.getMenu().add(0, 5, 4, R.string.gesture_forward).setEnabled(webView.canGoForward());
-            menu.getMenu().add(0, 6, 5, R.string.about);
-            menu.setOnMenuItemClickListener(item -> {
-                if (item.getItemId() == 1) webView.loadUrl(home());
-                else if (item.getItemId() == 3) showSchoolPicker();
-                else if (item.getItemId() == 4) webView.goBack();
-                else if (item.getItemId() == 5) webView.goForward();
-                else if (item.getItemId() == 6) {
+            AppMenu menu = new AppMenu(this);
+            menu.group(R.string.menu_navigation);
+            menu.action(R.string.dashboard, R.drawable.ic_menu_dashboard, true, () -> webView.loadUrl(home()));
+            menu.action(R.string.gesture_back, R.drawable.ic_menu_back, webView.canGoBack(), () -> webView.goBack());
+            menu.action(R.string.gesture_forward, R.drawable.ic_menu_forward, webView.canGoForward(), () -> webView.goForward());
+            menu.group(R.string.menu_page);
+            menu.action(R.string.refresh, R.drawable.ic_refresh, refresh.isEnabled(), () -> reloadPage());
+            menu.action(R.string.open_browser, R.drawable.ic_menu_browser, true,
+                    () -> openExternal(links.isInternal(webView.getUrl()) ? webView.getUrl() : home()));
+            menu.group(R.string.menu_app);
+            menu.action(R.string.switch_school, R.drawable.ic_menu_school, true, () -> showSchoolPicker());
+            menu.action(R.string.about, R.drawable.ic_menu_info, true, () -> {
                     if (getFragmentManager().findFragmentByTag(AboutDialog.TAG) == null) {
                         new AboutDialog().show(getFragmentManager(), AboutDialog.TAG);
                     }
-                }
-                else openExternal(links.isInternal(webView.getUrl()) ? webView.getUrl() : home());
-                return true;
             });
-            menu.show();
+            menu.show(more);
         });
         toolbar.addView(more, new LinearLayout.LayoutParams(dp(48), dp(48)));
         toolbar.setBackgroundColor(Color.WHITE);

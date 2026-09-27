@@ -23,7 +23,10 @@
     <string name="gesture_back">Back</string>
     <string name="gesture_forward">Forward</string>
     <string name="more">More options</string>
-    <string name="dashboard">Edookit dashboard</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="menu_navigation">Navigation</string>
+    <string name="menu_page">Page</string>
+    <string name="menu_app">App</string>
     <string name="cancel">Cancel</string>
     <string name="open_browser">Open in browser</string>
     <string name="loading">Loading Edookit…</string>

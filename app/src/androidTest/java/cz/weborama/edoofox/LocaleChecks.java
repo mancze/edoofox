@@ -13,7 +13,7 @@ final class LocaleChecks {
             Context localized = base.createConfigurationContext(config);
             boolean czech = tag.startsWith("cs") || tag.startsWith("sk") || tag.equals("de-DE,cs-CZ") || tag.equals("de-DE,sk-SK");
             check(localized.getString(R.string.choose_school), czech ? "Vyberte svou školu" : "Choose your school");
-            check(localized.getString(R.string.dashboard), czech ? "Nástěnka Edookitu" : "Edookit dashboard");
+            check(localized.getString(R.string.dashboard), czech ? "Nástěnka" : "Dashboard");
             check(localized.getString(R.string.cancel), czech ? "Zrušit" : "Cancel");
             Configuration referenceConfig = new Configuration(config);
             referenceConfig.setLocales(LocaleList.forLanguageTags(czech ? "cs-CZ" : "en-US"));
