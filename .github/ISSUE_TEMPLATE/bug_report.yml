@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible Edoofox problem using non-sensitive data.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Spare-time project: replies and fixes are not guaranteed.
+        Do not post passwords, cookies, student data, or unredacted school screenshots.
+        For vulnerabilities, use the private reporting instructions in SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: Edoofox version
+    validations:
+      required: true
+  - type: input
+    id: android
+    attributes:
+      label: Android and WebView versions
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use a fictional example if possible; no login credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true

@@ -1,0 +1,140 @@
+name: Signed release (draft)
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag at the selected main commit (for example v0.3.10)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: official-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'mancze/edoofox' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate version and immutable release source
+        id: version
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: |
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || exit 1
+          test "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")" = "$GITHUB_SHA"
+          version="$(sed -n 's/^[[:space:]]*versionName = "\([^"]*\)".*/\1/p' app/build.gradle.kts)"
+          test "$RELEASE_TAG" = "v$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '26'
+      - uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          cache-disabled: true
+      - name: Install Android build packages
+        run: |
+          "${ANDROID_HOME:?}/cmdline-tools/latest/bin/sdkmanager" \
+            "platforms;android-37.0" "build-tools;36.0.0"
+      - name: Check and build without signing secrets
+        run: bash ./gradlew --no-daemon -PreleaseSigning=disabled :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: unsigned-release
+          path: app/build/outputs/apk/release/edoofox-*-release-unsigned.apk
+          if-no-files-found: error
+          retention-days: 1
+
+  sign:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment: release-signing
+    permissions:
+      contents: read
+    steps:
+      # Intentionally no checkout, project scripts, Gradle, or restored build cache.
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: '26'
+      - name: Install signing tools
+        run: '"${ANDROID_HOME:?}/cmdline-tools/latest/bin/sdkmanager" "build-tools;36.0.0"'
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: unsigned-release
+          path: unsigned
+      - name: Sign and verify
+        env:
+          VERSION: ${{ needs.build.outputs.version }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          EXPECTED_CERT: ${{ vars.ANDROID_SIGNING_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          : "${ANDROID_KEYSTORE_BASE64:?Missing release-signing environment secret}"
+          : "${ANDROID_STORE_PASSWORD:?Missing store password}"
+          : "${ANDROID_KEY_ALIAS:?Missing alias}"
+          : "${ANDROID_KEY_PASSWORD:?Missing key password}"
+          [[ "$EXPECTED_CERT" =~ ^[a-f0-9]{64}$ ]] || { echo "Configure the public certificate fingerprint"; exit 1; }
+          umask 077
+          keyfile="$RUNNER_TEMP/edoofox-release-key.p12"
+          trap 'rm -f -- "$keyfile"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keyfile"
+          unset ANDROID_KEYSTORE_BASE64
+          tools="$ANDROID_HOME/build-tools/36.0.0"
+          input="unsigned/edoofox-$VERSION-release-unsigned.apk"
+          mkdir -p signed
+          output="signed/edoofox-$VERSION-release.apk"
+          "$tools/zipalign" -c -P 16 -v 4 "$input"
+          "$tools/apksigner" sign --ks "$keyfile" --ks-key-alias "$ANDROID_KEY_ALIAS" \
+            --ks-pass env:ANDROID_STORE_PASSWORD --key-pass env:ANDROID_KEY_PASSWORD \
+            --out "$output" "$input"
+          "$tools/apksigner" verify --verbose --print-certs "$output" > signed/signature.txt
+          grep -F "Signer #1 certificate SHA-256 digest: $EXPECTED_CERT" signed/signature.txt
+          cd signed
+          sha256sum "edoofox-$VERSION-release.apk" > SHA256SUMS.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: signed-release
+          path: |
+            signed/*.apk
+            signed/SHA256SUMS.txt
+            signed/signature.txt
+          if-no-files-found: error
+          retention-days: 7
+
+  draft:
+    needs: [build, sign]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: signed-release
+          path: signed
+      - name: Create draft release for manual review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ inputs.tag }}
+          VERSION: ${{ needs.build.outputs.version }}
+        run: |
+          gh release create "$RELEASE_TAG" --verify-tag --draft --generate-notes \
+            --title "Edoofox $VERSION" \
+            "signed/edoofox-$VERSION-release.apk" signed/SHA256SUMS.txt signed/signature.txt

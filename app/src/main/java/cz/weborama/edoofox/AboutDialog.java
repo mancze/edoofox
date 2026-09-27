@@ -33,6 +33,7 @@ public class AboutDialog extends DialogFragment {
         name.setTypeface(null, android.graphics.Typeface.BOLD);
         body.addView(name);
         body.addView(text(getString(R.string.about_slogan), 17));
+        body.addView(text(getString(R.string.about_unofficial), 14));
         body.addView(text(getString(R.string.about_version, BuildConfig.VERSION_NAME), 14));
         body.addView(text(getString(R.string.about_author, getString(R.string.author_name)), 16));
         Button github = new Button(activity);
