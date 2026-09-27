@@ -273,6 +273,7 @@ public class SmokeInstrumentation extends Instrumentation {
             dialog.set((android.app.AlertDialog) fragment.getDialog());
             View root = dialog.get().getWindow().getDecorView();
             for (String expected : new String[]{activity.getString(R.string.app_name), activity.getString(R.string.about_slogan),
+                    activity.getString(R.string.about_unofficial),
                     activity.getString(R.string.about_version, BuildConfig.VERSION_NAME), activity.getString(R.string.about_author, "Michal Novák")}) {
                 require(findText(root, expected), "About contains " + expected);
             }
@@ -282,6 +283,7 @@ public class SmokeInstrumentation extends Instrumentation {
         external.addCategory(Intent.CATEGORY_BROWSABLE);
         external.addDataScheme("https");
         external.addDataAuthority("github.com", null);
+        external.addDataPath("/mancze/edoofox", android.os.PatternMatcher.PATTERN_LITERAL);
         ActivityMonitor monitor = addMonitor(external, new ActivityResult(Activity.RESULT_CANCELED, null), true);
         runOnMainSync(() -> findButton(dialog.get().getWindow().getDecorView(), activity.getString(R.string.github_project)).performClick());
         require(monitor.getHits() == 1, "GitHub opens externally");

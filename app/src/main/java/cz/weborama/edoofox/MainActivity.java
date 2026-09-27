@@ -36,7 +36,7 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private static final int PICK_FILES = 100;
     // Replace with the project's repository URL when it is available.
-    private static final String PROJECT_URL = "https://github.com/";
+    private static final String PROJECT_URL = "https://github.com/mancze/edoofox";
     private static final int PURPLE = Color.rgb(103, 51, 156);
     private WebView webView;
     private ProgressBar progress;

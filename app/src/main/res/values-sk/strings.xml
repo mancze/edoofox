@@ -4,6 +4,7 @@
     <string name="show_app_menu">Zobrazit nabídku aplikace</string>
     <string name="about">O aplikaci</string>
     <string name="about_slogan">Web Edookitu v jednoduché aplikaci pro Android.</string>
+    <string name="about_unofficial">Nezávislý neoficiální klient. Není propojený s Edookitem ani Plus4U a nemá jejich oficiální podporu.</string>
     <string name="about_version">Verze %1$s</string>
     <string name="about_author">Autor: %1$s</string>
     <string name="close">Zavřít</string>
