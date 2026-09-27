@@ -31,7 +31,7 @@ jobs:
       - name: Install Android build packages
         run: |
           "${ANDROID_HOME:?}/cmdline-tools/latest/bin/sdkmanager" \
-            "platforms;android-37" "build-tools;36.0.0" "platform-tools"
+            "platforms;android-37.0" "build-tools;36.0.0" "platform-tools"
       - name: Build, unit tests, lint, and unsigned release
         run: bash ./gradlew --no-daemon -PreleaseSigning=disabled :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
       - name: Compile isolated QA and instrumentation APKs
