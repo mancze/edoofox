@@ -68,8 +68,9 @@ Updates must use the same signing key. A debug build or independently signed
 fork cannot replace an official release with the same application ID.
 Uninstalling removes locally stored settings and sessions.
 
-The application ID remains `cz.weborama.edoofox` for update compatibility,
-following the rename from Edoofox.
+The application ID is `cz.weborama.edoofox`, under the maintainer's weborama.cz
+domain. This is a new installation compared with earlier development builds:
+select your school and sign in again. Existing app data is not migrated.
 
 ## Build and contribute
 

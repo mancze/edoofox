@@ -1,5 +1,13 @@
 # Validation
 
+## Edoofox 0.3.11 — Weborama application identity, 2026-09-27
+
+- Application ID, namespace, Java source packages, and instrumentation runner now use `cz.weborama.edoofox`; QA uses the `.qa` suffix. This installs separately from earlier development builds, without migrating their data.
+- Themes and synthetic test fixtures use Edoofox branding. The About author remains unchanged. Historical notes below describe their original test runs, with obsolete identity labels omitted.
+- Debug and signed release builds, all seven unit tests, and QA/test APK compilation passed. Lint reported zero errors and one Gradle-version update warning.
+- Gestures, locales, and About instrumentation passed on the isolated API 36 emulator under the new QA identity. Production app data was not touched.
+- Signed release package/version verified as `cz.weborama.edoofox`, version 0.3.11 (14); signing certificate unchanged. Verified release copied to the configured delivery folder.
+
 ## Edoofox 0.3.10 — open-source preparation, 2026-09-27
 
 - Clean-clone debug build, unit tests, lint, and unsigned release build passed without signing files. Explicit required-signing mode rejected missing credentials.
@@ -55,7 +63,7 @@
 ## Edoofox 0.3.0 — 2026-09-16
 
 - Debug APK and unsigned release AAB built. Seven JVM tests passed; Android lint reported no issues. APK signature, app label, application ID, and version verified.
-- Android 16 / API 36 emulator checks use the separate `cz.weborama.edoofox.qa` app and local HTML fixtures. Existing signed-in app storage was not accessed or changed.
+- Android 16 / API 36 emulator checks used the then-current separate QA application ID and local HTML fixtures. Existing signed-in app storage was not accessed or changed.
 - Real touch input verified right-swipe Back, left-swipe Forward, automatic header hiding, full page expansion without a leftover header gap, pull-to-reveal without reload, and a separate pull-to-refresh exactly once.
 - Short and cancelled pulls did not reload. Nested vertical content scrolled without refreshing. Horizontal widgets and text inputs did not trigger history navigation. Header-visible and header-hidden fixture screenshots were visually checked.
 - Gestures have menu/button alternatives. Edge swipes remain Android-owned. TalkBack, keyboard handling, multi-touch, and actual authenticated Edookit layouts still need physical-device usability checks; they were not exhaustively exercised by this fixture suite.
@@ -83,11 +91,11 @@
 
 ## Device checks
 
-Tested on the isolated `Edoofox_Test` Android 16 / API 36 emulator:
+Tested on an isolated Android 16 / API 36 development emulator:
 
 - Public school login page renders.
 - Automatic Plus4U session-restoration redirect completes.
-- Interactive Plus4U sign-in form opens inside Edoofox.
+- Interactive Plus4U sign-in form opens inside the app.
 - Internal link stays in the WebView.
 - System Back navigates history and keeps the app open.
 - External HTTPS link dispatches a browser intent and preserves the app page.
@@ -99,9 +107,9 @@ No real credentials were entered. Completing account login, signing out, and ret
 
 ## Deliverables
 
-- `artifacts/Edoofox-0.1.0-debug.apk` — installable development build, 903,445 bytes.
+- Original 0.1.0 debug APK — installable development build, 903,445 bytes (historical artifact name omitted).
 - APK SHA-256: `652a3101737c44164c803b4d9f4d8f1bdd41f40ea064623d57d85b000508a80b`.
-- `artifacts/Edoofox-0.1.0-unsigned.aab` — unsigned bundle for later release preparation, not ready for Play upload.
+- Original 0.1.0 unsigned AAB — unsigned bundle for later release preparation, not ready for Play upload (historical artifact name omitted).
 - `artifacts/screenshots/` — public login, Plus4U sign-in, and offline screens.
 
 Artifacts are ignored by Git and can be regenerated. No publication or account creation was performed.

@@ -20,9 +20,10 @@ For an installable official release:
 ./gradlew -PreleaseSigning=required :app:assembleRelease
 ```
 
-Continue using the EXISTING official signing key. Creating a new key would
-break normal updates for existing installations. The application ID must
-remain `cz.weborama.edoofox`. Fork maintainers should use their own keys.
+Continue using the EXISTING official signing key. Future updates require both
+that key and the application ID `cz.weborama.edoofox`. The 0.3.11 branding change
+uses a new application ID, so it installs separately from earlier development
+builds even though the key is unchanged. Fork maintainers should use their own keys.
 
 The official signing certificate's public SHA-256 fingerprint, verified from
 the 0.3.9 APK, is:
@@ -62,7 +63,7 @@ These settings and secrets are NOT provisioned by committing the workflow.
 | --- | --- |
 | `ANDROID_KEYSTORE_BASE64` | Base64 of the existing release keystore |
 | `ANDROID_STORE_PASSWORD` | Existing keystore password |
-| `ANDROID_KEY_ALIAS` | Existing alias, currently `edoofox-release` |
+| `ANDROID_KEY_ALIAS` | Exact alias from your private signing configuration; do not change it just to match the app name |
 | `ANDROID_KEY_PASSWORD` | Existing key password |
 
 5. Add environment **variable** `ANDROID_SIGNING_CERT_SHA256` with the fingerprint above.

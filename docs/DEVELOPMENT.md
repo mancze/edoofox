@@ -24,8 +24,9 @@ configuration, release APKs end in `-release-unsigned.apk` and cannot be install
 until signed. Build outputs are under `app/build/outputs/apk/<variant>/`.
 See [signing](SIGNING.md) for optional signed releases.
 
-Keep the production application ID `cz.weborama.edoofox` for updates to existing
-installations, despite the project rename.
+The production application ID and Java namespace are `cz.weborama.edoofox`.
+Keep this ID for future updates. Earlier development builds used a different
+ID; this branded app installs separately and does not migrate their data.
 
 ## Isolated QA
 
