@@ -26,7 +26,9 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
       - name: Install Android build packages
-        run: sdkmanager "platforms;android-37" "build-tools;36.0.0" "platform-tools"
+        run: |
+          "${ANDROID_HOME:?}/cmdline-tools/latest/bin/sdkmanager" \
+            "platforms;android-37" "build-tools;36.0.0" "platform-tools"
       - name: Build QA APKs
         run: bash ./gradlew --no-daemon -PreleaseSigning=disabled -Pqa :app:assembleQa :app:assembleQaAndroidTest
       - name: Enable KVM for the hosted runner
