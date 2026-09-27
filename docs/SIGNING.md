@@ -122,7 +122,7 @@ unexpected environment request. Local signing remains a supported alternative.
    and check CI. Run relevant local QA for UI/gesture changes; CI does not cover
    emulator behavior. Use SSH for Git:
    `git remote set-url origin git@github.com:mancze/edoofox.git`.
-2. Tag the exact current main commit, for example `v0.3.10`, and push that tag.
+2. Tag the exact current main commit, for example `v0.3.12`, and push that tag.
    The workflow checks that the tag points to its selected main commit and
    matches the app's version.
 3. Run **Signed release (draft)** from the Actions tab, select **main**, and
