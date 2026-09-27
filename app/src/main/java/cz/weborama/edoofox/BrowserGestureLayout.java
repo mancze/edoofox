@@ -38,7 +38,7 @@ public final class BrowserGestureLayout extends FrameLayout {
     private long downTime;
     private int sequence;
     private boolean probed, protectedTarget, horizontalContent, canScrollUp, canScrollDown;
-    private boolean refreshOnThisPull, thresholdReached, tracking;
+    private boolean refreshOnThisPull, thresholdReached, tracking, pageAtTopOnDown;
     private int historyDirection;
     private final AccessibilityManager.TouchExplorationStateChangeListener explorationListener = active -> {
         if (active) { cancelGesture(); reveal(); }
@@ -143,6 +143,7 @@ public final class BrowserGestureLayout extends FrameLayout {
             downX = event.getX(); downY = lastY = event.getY();
             downTime = SystemClock.uptimeMillis();
             startOffset = offset;
+            pageAtTopOnDown = !web.canScrollVertically(-1);
             refreshOnThisPull = isHeaderShown() && !loading;
             thresholdReached = false;
             probed = false;
@@ -181,7 +182,7 @@ public final class BrowserGestureLayout extends FrameLayout {
                 } else mode = Mode.IGNORE;
             } else if (Math.abs(dy) > Math.abs(dx) * 1.4f) {
                 stopAnimation();
-                if (dy > 0 && !canScrollUp && !web.canScrollVertically(-1)
+                if (dy > 0 && pageAtTopOnDown && !canScrollUp && !web.canScrollVertically(-1)
                         && (startOffset > 0 || refreshOnThisPull)) mode = Mode.PULL;
                 else mode = Mode.SCROLL;
             }

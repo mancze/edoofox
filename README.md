@@ -17,7 +17,7 @@ Renamed from Edoofox. The Android application ID remains `cz.weborama.edoofox` s
 - Cookies and DOM storage are retained. Persistent cookies are flushed to disk when pages finish and the app pauses. Actual session lifetime and the “stay signed in” option are controlled by Edookit/Plus4U.
 - Swipe right within the page to go Back, or left to go Forward. Android's system-edge Back gesture stays unchanged. Back/Forward also appear in the menu.
 - The header hides automatically once the selected school's content has settled, without needing a scroll. Login/Plus4U, school selection, and native error screens keep the header visible. A lightweight foreground-only check recognizes public login markers and authentication routes; this is a presentation heuristic, not proof of authentication. Blank/loading pages remain visible, and site layout changes may require detection updates.
-- Pulling downwards reveals the header; it stays open until scrolling away or navigating. At the top of the page, the first pull reveals a hidden header **without reloading**. Release, then pull again until “Release to refresh” appears to reload. A visible header permits refresh on the first pull. Short/cancelled pulls do nothing.
+- A downward gesture begun below the top scrolls the page back to the top without revealing the header. Only a new pull begun while the page is already at the top reveals the hidden header; it stays open until scrolling away or navigating. Release, then pull again until “Release to refresh” appears to reload. A visible header permits refresh on the first pull. Short/cancelled pulls do nothing.
 - At the top of the document, a floating fox button appears when the header is fully hidden. Tap it to reveal the header without navigating or reloading. It disappears while scrolling, loading, or showing the header. The website's own scroll-to-top control is left unchanged.
 - Horizontal scroll containers and editable fields retain their own gestures. Nested vertical scrolling is respected. Custom gestures are disabled while the keyboard or school chooser is open and during touch exploration (TalkBack); the header remains accessible. Error screens reveal the controls. Loading prevents duplicate pull-refreshes. System status/navigation bars remain visible.
 - Refresh button, **Edookit dashboard / Nástěnka Edookitu**, and open-in-browser menu. The dashboard opens the selected Edookit school root. No external school-homepage item is offered because its address is not known.
@@ -37,9 +37,9 @@ Builds use the pinned Gradle 9.7.1 wrapper (distribution checksum verified) and 
 .\gradlew.bat :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-Build APKs follow `edoofox-<version>-<build-type>.apk`, for example `edoofox-0.3.5-debug.apk`. The installable development APK is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
+Build APKs follow `edoofox-<version>-<build-type>.apk`, for example `edoofox-0.3.6-debug.apk`. The installable development APK is signed with the local Android debug key. Keep it for testing; it is not the Play Store release.
 
-The current packaged build is `artifacts/Edoofox-0.3.5-debug.apk`.
+The current packaged build is `artifacts/Edoofox-0.3.6-debug.apk`.
 
 For an installable personal release, configure the ignored `keystore.properties`
 file with the keystore path, alias, and passwords, then run:
@@ -49,7 +49,7 @@ file with the keystore path, alias, and passwords, then run:
 .\gradlew.bat :app:assembleRelease
 ```
 
-The signed APK is `app/build/outputs/apk/release/edoofox-0.3.5-release.apk`. Back up the
+The signed APK is `app/build/outputs/apk/release/edoofox-0.3.6-release.apk`. Back up the
 keystore and `keystore.properties` securely; future releases must use the same
 key to update an installed app.
 
@@ -66,7 +66,7 @@ Gesture tests use a separate `.qa` application ID and locally intercepted HTML p
 ```powershell
 .\gradlew.bat -Pqa :app:assembleQa :app:assembleQaAndroidTest
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb -s emulator-5556 install -r app/build/outputs/apk/qa/edoofox-0.3.5-qa.apk
+& $adb -s emulator-5556 install -r app/build/outputs/apk/qa/edoofox-0.3.6-qa.apk
 & $adb -s emulator-5556 install -r app/build/outputs/apk/androidTest/qa/app-qa-androidTest.apk
 & $adb -s emulator-5556 shell am instrument -w -e phase gestures cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
 & $adb -s emulator-5556 shell am instrument -w -e phase locales cz.weborama.edoofox.qa.test/cz.weborama.edoofox.SmokeInstrumentation
@@ -80,7 +80,7 @@ Use an isolated emulator, without a real signed-in account. The tests navigate t
 ```powershell
 .\gradlew.bat :app:assembleDebug :app:assembleDebugAndroidTest
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"
-& $adb -s emulator-5556 install -r app/build/outputs/apk/debug/edoofox-0.3.5-debug.apk
+& $adb -s emulator-5556 install -r app/build/outputs/apk/debug/edoofox-0.3.6-debug.apk
 & $adb -s emulator-5556 install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 & $adb -s emulator-5556 shell am instrument -w -e phase schools cz.weborama.edoofox.test/cz.weborama.edoofox.SmokeInstrumentation
 & $adb -s emulator-5556 shell am force-stop cz.weborama.edoofox

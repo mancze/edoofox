@@ -85,7 +85,11 @@ final class GestureChecks {
         check(!main(menuButton::isShown), "fox shortcut absent while document is scrolled");
         check(main(() -> ((View) web.getParent()).getTop() == 0), "no header gap");
         screenshot("gesture-hidden.png");
-        test.runOnMainSync(() -> web.scrollTo(0,0));
+        test.runOnMainSync(() -> web.scrollTo(0,320));
+        waitFor(() -> main(() -> web.canScrollVertically(-1)), "document starts below top");
+        swipe(.5f,.4f,.5f,.8f,false);
+        waitFor(() -> main(() -> !web.canScrollVertically(-1)), "first downward pull reaches page top");
+        check(main(chrome::isHeaderHidden), "pull that started below top does not reveal header");
         waitFor(menuButton::isShown, "fox shortcut returns after scrolling to top");
         int before = loads.get();
         swipe(.5f,.4f,.5f,.8f,false);
