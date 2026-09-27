@@ -25,6 +25,7 @@ check(releaseSigning != "required" || hasReleaseSigning) {
 android {
     namespace = "cz.weborama.edoofox"
     compileSdk = 37
+    buildToolsVersion = "36.0.0"
     buildFeatures { buildConfig = true }
     defaultConfig {
         applicationId = "cz.weborama.edoofox"
