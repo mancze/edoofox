@@ -75,7 +75,7 @@ These settings and secrets are NOT provisioned by committing the workflow.
    are not a backup system and cannot be read back through the UI.
 
 To encode the key on Windows without printing it in a terminal, use PowerShell
-on your own machine (replace the example path):
+on your own machine (enter the full path when prompted):
 
 ```powershell
 $keyPath = Read-Host 'Signing keystore path'

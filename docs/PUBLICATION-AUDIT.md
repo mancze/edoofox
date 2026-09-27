@@ -16,10 +16,11 @@ that no unknown secret exists.
   properties, or machine-specific SDK properties.
 - Commit identity uses the author's GitHub no-reply email, not a private
   email address. The author's name is intentionally public in the app.
-- Existing documentation/history contains a Windows username/path and a
-  real school's publicly accessible subdomain used during development.
-  These are personal context, not credentials. Current onboarding docs use
-  generic paths. No history rewrite was performed.
+- The initial review found a machine-specific Windows path and a real
+  school's publicly accessible subdomain used during development.
+  A subsequent full local history cleanup removes absolute Windows path
+  literals across all refs. The public school subdomain remains; it is not
+  a credential. Remote copies require separate verification and cleanup.
 - Historical documentation names local screenshots, but no screenshots or
   student records were found among the tracked historical files.
 - The new README screenshot was captured from the isolated QA app with the
