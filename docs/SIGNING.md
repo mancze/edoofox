@@ -20,16 +20,21 @@ For an installable official release:
 ./gradlew -PreleaseSigning=required :app:assembleRelease
 ```
 
-Continue using the EXISTING official signing key. Future updates require both
-that key and the application ID `cz.weborama.edoofox`. The 0.3.11 branding change
-uses a new application ID, so it installs separately from earlier development
-builds even though the key is unchanged. Fork maintainers should use their own keys.
+Use the Weborama release key created on 2026-09-27 for future releases.
+Its public identity is `CN=Edoofox, OU=Android, O=Weborama, C=CZ`, with alias
+`edoofox-release`, 3072-bit RSA, and certificate expiry on 2054-02-12.
+Future updates require this key and application ID `cz.weborama.edoofox`.
 
-The official signing certificate's public SHA-256 fingerprint, verified from
-the 0.3.9 APK, is:
+This is a replacement key, not a signing-key rotation lineage. Existing
+development APKs, including the previously distributed 0.3.11 APK, used the
+old key. They cannot be updated in place with this key: uninstall first (which
+removes local settings and sessions), then install and sign in again. Keep
+the old key backed up. Fork maintainers should use their own keys.
+
+The new certificate's verified public SHA-256 fingerprint is:
 
 ```text
-636be67d2747a0cb0f4910939cb438842128d7110b915318ab96de3b842928b2
+ce6292a8755206e8d0a32c23e86c8e3b955788e911b9915485145baade0bb779
 ```
 
 A certificate fingerprint is public, not a secret. It is different from an
