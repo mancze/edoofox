@@ -1,5 +1,13 @@
 # Validation
 
+## Edoofox 0.3.12 — Weborama release certificate, 2026-09-27
+
+- Version code 15; application ID remains `cz.weborama.edoofox`. No runtime/UI changes.
+- Local debug and signed release builds, all seven JVM tests, and lint passed (zero errors, one Gradle-version update warning). Workflow syntax passed Actionlint. Emulator tests were not rerun for this version/certificate-only change.
+- Release APK signature verified against the Weborama certificate documented in `docs/SIGNING.md`; package and version checked. Delivery copy hash verified before replacing the previous APK.
+- This certificate cannot update installations signed with the previous development key, including 0.3.11. Uninstall/reinstall is required and removes local sessions/settings. Back up anything needed first.
+- GitHub release signing and device installation remain separate checks; the local build does not establish that the uploaded GitHub secrets are correct.
+
 ## GitHub QA scope decision — 2026-09-27
 
 - Removed the emulator workflow and instrumentation APK compilation from GitHub CI because hosted-runner storage prevented emulator startup. CI covers debug/unsigned release builds, JVM unit tests, and lint only.
