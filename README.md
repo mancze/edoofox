@@ -3,6 +3,8 @@
 A small Android app that gives your school's Edookit website a home of its own.
 Choose your school, sign in, and keep school messages a tap away.
 
+[Project website (Czech)](https://mancze.github.io/edoofox/)
+
 **Edoofox is an independent, unofficial client. It is not affiliated with,
 endorsed by, or supported by Edookit or Plus4U.** It displays their website;
 it does not replace their service.
@@ -52,9 +54,10 @@ Screenshot from the isolated QA app using a fictional school; no account data.
 
 ## Install
 
-Official APKs are intended to be distributed through
-[GitHub Releases](https://github.com/mancze/edoofox/releases). If there is no
-release yet, build from source or wait for the first published APK.
+Download official APKs from
+[GitHub Releases](https://github.com/mancze/edoofox/releases). The
+[project website](https://mancze.github.io/edoofox/) has a short Czech
+introduction and installation guide.
 
 1. Download the versioned `edoofox-<version>-release.apk` release asset.
 2. Open it on your phone and, if prompted, allow installation from that source.
