@@ -38,6 +38,8 @@ final class GestureChecks {
                     String html = "<meta name='viewport' content='width=device-width,initial-scale=1'><body style='margin:0;background:#faf8fd'>"
                             + (r.getUrl().getPath().equals("/login") ? "<div data-name='Login'>Sign in</div>" : "")
                             + "<h1>Gesture test</h1><div id='nested' style='height:120px;overflow:auto'><div style='height:900px'>Nested scroll</div></div>"
+                            + "<button id='scroll-to-top' style='position:fixed;bottom:24px;right:24px'>Website top</button>"
+                            + "<button id='unrelated-action' style='position:fixed;bottom:24px;left:24px'>Other action</button>"
                             + "<div style='height:3500px;padding:20px'>Edoofox local test page</div></body>";
                     return new WebResourceResponse("text/html", "UTF-8", new ByteArrayInputStream(html.getBytes(StandardCharsets.UTF_8)));
                 }
@@ -49,6 +51,8 @@ final class GestureChecks {
         waitFor(() -> web.getProgress() == 100 && web.getUrl().endsWith("/login"), "login fixture");
         SystemClock.sleep(2500);
         check(main(chrome::isHeaderShown), "signed-out header remains visible");
+        check(!main(() -> activity.findViewById(R.id.go_dashboard).isShown()), "no floating Home during login");
+        check(!main(() -> activity.findViewById(R.id.dashboard_bar).isShown()), "no app-bar Home during login");
         View notice = activity.findViewById(R.id.login_notice);
         check(main(notice::isShown), "login support notice shown on school login");
         screenshot("login-support-notice.png");
@@ -58,6 +62,7 @@ final class GestureChecks {
         waitFor(() -> web.getProgress() == 100 && web.getUrl().endsWith("/one"), "first fixture");
         waitFor(chrome::isHeaderHidden, "content automatically hides header without scrolling");
         check(!main(notice::isShown), "login notice hidden on school content");
+        checkActionStack(activity);
         View menuButton = activity.findViewById(R.id.show_app_menu);
         waitFor(menuButton::isShown, "fox shortcut visible at page top with hidden header");
         screenshot("fox-menu-shortcut.png");
@@ -82,7 +87,7 @@ final class GestureChecks {
         waitFor(() -> web.getUrl().endsWith("/two"), "swipe Forward");
         swipe(.5f,.8f,.5f,.3f,false);
         waitFor(() -> chrome.isHeaderHidden(), "header hides");
-        check(!main(menuButton::isShown), "fox shortcut absent while document is scrolled");
+        waitFor(() -> actionLabel(menuButton, R.string.scroll_to_top), "scroll action replaces fox while document is scrolled");
         check(main(() -> ((View) web.getParent()).getTop() == 0), "no header gap");
         screenshot("gesture-hidden.png");
         test.runOnMainSync(() -> web.scrollTo(0,2000));
@@ -142,6 +147,106 @@ final class GestureChecks {
         swipe(.5f,.8f,.5f,.3f,false);
         check(main(chrome::isHeaderShown), "Plus4U header stays visible");
         test.runOnMainSync(activity::finish);
+    }
+
+    private void checkActionStack(Activity activity) {
+        View home = activity.findViewById(R.id.go_dashboard);
+        View secondary = activity.findViewById(R.id.show_app_menu);
+        View barHome = activity.findViewById(R.id.dashboard_bar);
+        waitFor(home::isShown, "off-Dashboard Home appears");
+        check(main(() -> secondary.getBottom() < home.getTop() && secondary.getWidth() < home.getWidth()),
+                "secondary action is smaller and above Home");
+        check("\"none\"".equals(js("getComputedStyle(document.getElementById('scroll-to-top')).display")),
+                "website top control suppressed while native replacement is active");
+        check(!"\"none\"".equals(js("getComputedStyle(document.getElementById('unrelated-action')).display")),
+                "unrelated website controls unchanged");
+        screenshot("actions-off-dashboard-top.png");
+
+        tap(secondary);
+        waitFor(chrome::isHeaderShown, "fox reveals app bar without opening another page");
+        check(main(home::isShown), "Home remains available when header is shown");
+        check(!main(secondary::isShown), "fox disappears while header is shown");
+        check(main(barHome::isShown), "Home pinned in wide app bar");
+        View bar = (View) barHome.getParent();
+        test.runOnMainSync(() -> {
+            ViewGroup.LayoutParams params = bar.getLayoutParams();
+            params.width = Math.round(320 * activity.getResources().getDisplayMetrics().density);
+            bar.setLayoutParams(params);
+        });
+        waitFor(() -> barHome.getVisibility() == View.GONE, "narrow app bar omits optional Home");
+        test.runOnMainSync(() -> {
+            ViewGroup.LayoutParams params = bar.getLayoutParams();
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            bar.setLayoutParams(params);
+        });
+        waitFor(barHome::isShown, "Home returns when app bar has room");
+        tap(barHome);
+        waitFor(() -> "https://gesture-test.edookit.net/".equals(web.getUrl()) && chrome.isHeaderHidden(),
+                "app-bar Home opens Dashboard");
+        waitFor(() -> !home.isShown() && secondary.isShown(), "Dashboard uses a single action");
+        check(main(() -> secondary.getWidth() == home.getWidth()), "single Dashboard action uses primary size");
+        check(main(() -> barHome.getVisibility() == View.GONE), "app-bar Home absent on Dashboard");
+        screenshot("actions-dashboard-top.png");
+
+        int before = loads.get();
+        test.runOnMainSync(() -> web.scrollTo(0, 1400));
+        waitFor(() -> actionLabel(secondary, R.string.scroll_to_top), "Dashboard scroll-to-top action");
+        screenshot("actions-dashboard-scrolled.png");
+        tap(secondary);
+        waitFor(() -> !web.canScrollVertically(-1) && actionLabel(secondary, R.string.show_app_menu),
+                "scroll action returns to top and becomes fox");
+        check(loads.get() == before && main(chrome::isHeaderHidden), "scroll-to-top does not reload or reveal header");
+
+        js("history.pushState({}, '', '/?page=messages')");
+        waitFor(home::isShown, "query route is not mistaken for Dashboard");
+        test.runOnMainSync(() -> web.scrollTo(0, 1400));
+        waitFor(() -> actionLabel(secondary, R.string.scroll_to_top), "off-Dashboard scrolling keeps both actions");
+        screenshot("actions-off-dashboard-scrolled.png");
+        tap(home);
+        waitFor(() -> "https://gesture-test.edookit.net/".equals(web.getUrl()) && !home.isShown(),
+                "floating Home opens Dashboard without a swipe");
+        waitFor(chrome::isHeaderHidden, "Dashboard settled");
+
+        test.runOnMainSync(() -> chrome.setGesturesEnabled(false));
+        check(!"\"none\"".equals(js("getComputedStyle(document.getElementById('scroll-to-top')).display")),
+                "website top control restored when native actions are unavailable");
+        test.runOnMainSync(() -> chrome.setGesturesEnabled(true));
+        waitFor(secondary::isShown, "native actions resume");
+
+        js("document.body.innerHTML=\"<div id='large' style='height:70vh;overflow:auto'><div style='height:3000px'>Large scrolling page</div></div>"
+                + "<div id='small' style='height:60px;overflow:auto'><div style='height:1000px'>Small widget</div></div>"
+                + "<div id='hidden' style='visibility:hidden;position:fixed;inset:0;overflow:auto'><div style='height:3000px'>Hidden pane</div></div>\";"
+                + "window.scrollTo(0,0); document.getElementById('large').scrollTop=500;"
+                + "document.getElementById('small').scrollTop=100; document.getElementById('hidden').scrollTop=200;");
+        waitFor(() -> actionLabel(secondary, R.string.scroll_to_top), "large nested scroller is recognized");
+        double smallPosition = Double.parseDouble(js("document.getElementById('small').scrollTop"));
+        double hiddenPosition = Double.parseDouble(js("document.getElementById('hidden').scrollTop"));
+        tap(secondary);
+        waitFor(() -> actionLabel(secondary, R.string.show_app_menu), "nested scroll-to-top becomes fox");
+        check("0".equals(js("document.getElementById('large').scrollTop")), "large visible scroller returns to top");
+        check(Math.abs(smallPosition - Double.parseDouble(js("document.getElementById('small').scrollTop"))) < 1,
+                "small widget retains its scroll position");
+        check(Math.abs(hiddenPosition - Double.parseDouble(js("document.getElementById('hidden').scrollTop"))) < 1,
+                "hidden pane retains its scroll position");
+        test.runOnMainSync(() -> web.loadUrl("https://gesture-test.edookit.net/one"));
+        waitFor(() -> web.getProgress() == 100 && chrome.isHeaderHidden() && home.isShown(), "restore off-Dashboard fixture");
+    }
+
+    private boolean actionLabel(View action, int label) {
+        return action.isShown() && test.getTargetContext().getString(label).contentEquals(action.getContentDescription());
+    }
+
+    private void tap(View view) {
+        int[] location = new int[2];
+        test.runOnMainSync(() -> {
+            view.getLocationOnScreen(location);
+            location[0] += view.getWidth() / 2;
+            location[1] += view.getHeight() / 2;
+        });
+        long time = SystemClock.uptimeMillis();
+        send(time, MotionEvent.ACTION_DOWN, location[0], location[1]);
+        send(time, MotionEvent.ACTION_UP, location[0], location[1]);
+        SystemClock.sleep(300);
     }
     private String js(String script) {
         java.util.concurrent.CountDownLatch done = new java.util.concurrent.CountDownLatch(1);

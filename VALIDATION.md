@@ -1,5 +1,13 @@
 # Validation
 
+## Edoofox 0.3.13 — Dashboard actions, 2026-11-19
+
+- Version code 16. Added floating Dashboard navigation, scroll-to-top and fox/menu actions, with optional app-bar Home when space allows. Dashboard detection uses the selected school's root URL.
+- Eight JVM tests, debug/release builds and lint passed (zero errors, one Gradle-version warning). Android Gradle Plugin upgraded to 9.4.1.
+- Gesture, locale and About instrumentation passed on the isolated API 36 QA emulator. Synthetic fixtures cover nested scrolling, narrow app bars, login transitions, history and two-step refresh. Authenticated school layouts were not inspected.
+- Verified that only the known Edookit scroll-to-top control is suppressed while native actions are available, and that the website control is restored when they are disabled.
+- Signed release verified against the existing Weborama certificate in `docs/SIGNING.md`. Production app data was not accessed.
+
 ## Edoofox 0.3.12 — Weborama release certificate, 2026-09-27
 
 - Version code 15; application ID remains `cz.weborama.edoofox`. No runtime/UI changes.

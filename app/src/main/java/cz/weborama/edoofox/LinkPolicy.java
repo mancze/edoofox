@@ -39,6 +39,22 @@ public final class LinkPolicy {
         }
     }
 
+    public boolean isDashboard(String url) {
+        if (!isInternal(url)) return false;
+        try {
+            URI uri = new URI(url);
+            String path = uri.getPath();
+            String fragment = uri.getFragment();
+            // The school root is the verified Dashboard destination. Do not guess
+            // aliases or classify query/hash application routes as the Dashboard.
+            boolean homePath = path == null || path.isEmpty() || "/".equals(path);
+            boolean homeFragment = fragment == null || fragment.isEmpty() || "top".equals(fragment);
+            return homePath && homeFragment && (uri.getRawQuery() == null || uri.getRawQuery().isEmpty());
+        } catch (URISyntaxException e) {
+            return false;
+        }
+    }
+
     public static boolean canOpenExternally(String url) {
         try {
             URI uri = new URI(url);

@@ -24,8 +24,10 @@ public final class BrowserGestureLayout extends FrameLayout {
     private View page;
     private WebView web;
     private Runnable refresh;
+    private Runnable goDashboard;
     private final TextView feedback;
     private final ImageButton menuButton;
+    private final ImageButton dashboardButton;
     private final int barHeight;
     private final int slop;
     private float offset;
@@ -33,6 +35,12 @@ public final class BrowserGestureLayout extends FrameLayout {
     private boolean enabled;
     private boolean loading;
     private boolean autoHideHeader;
+    private boolean dashboardPage = true;
+    private boolean documentAtTop = true;
+    private boolean pagePositionKnown;
+    private int pageProbe;
+    private int navigationRevision;
+    private final Runnable delayedPageProbe = this::probePageActions;
     private Mode mode = Mode.IGNORE;
     private float downX, downY, lastY, startOffset, distance;
     private long downTime;
@@ -42,6 +50,7 @@ public final class BrowserGestureLayout extends FrameLayout {
     private int historyDirection;
     private final AccessibilityManager.TouchExplorationStateChangeListener explorationListener = active -> {
         if (active) { cancelGesture(); reveal(); }
+        probePageActions();
     };
 
     public BrowserGestureLayout(Context context) {
@@ -61,22 +70,32 @@ public final class BrowserGestureLayout extends FrameLayout {
         feedback.setBackground(background);
         feedback.setVisibility(GONE);
         feedback.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
-        menuButton = new ImageButton(context);
-        menuButton.setId(R.id.show_app_menu);
-        menuButton.setImageResource(R.drawable.ic_fox);
-        menuButton.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
-        menuButton.setContentDescription(context.getString(R.string.show_app_menu));
-        menuButton.setTooltipText(context.getString(R.string.show_app_menu));
+        menuButton = actionButton(R.id.show_app_menu, R.drawable.ic_fox_action, R.string.show_app_menu);
+        menuButton.setOnClickListener(v -> activatePageAction());
+        dashboardButton = actionButton(R.id.go_dashboard, R.drawable.ic_menu_dashboard, R.string.dashboard);
+        dashboardButton.setOnClickListener(v -> {
+            cancelGesture();
+            if (goDashboard != null) goDashboard.run();
+        });
+    }
+
+    private ImageButton actionButton(int id, int icon, int label) {
+        ImageButton button = new ImageButton(getContext());
+        button.setId(id);
+        button.setImageResource(icon);
+        button.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+        button.setContentDescription(getContext().getString(label));
+        button.setTooltipText(getContext().getString(label));
         GradientDrawable circle = new GradientDrawable();
         circle.setShape(GradientDrawable.OVAL);
         circle.setColor(Color.WHITE);
         circle.setStroke(dp(1), Color.rgb(226, 212, 240));
-        menuButton.setBackground(new android.graphics.drawable.RippleDrawable(
+        button.setBackground(new android.graphics.drawable.RippleDrawable(
                 android.content.res.ColorStateList.valueOf(Color.argb(45, 103, 51, 156)), circle, null));
-        menuButton.setPadding(dp(10), dp(10), dp(10), dp(10));
-        menuButton.setElevation(dp(6));
-        menuButton.setVisibility(GONE);
-        menuButton.setOnClickListener(v -> { cancelGesture(); reveal(); });
+        button.setPadding(dp(12), dp(12), dp(12), dp(12));
+        button.setElevation(dp(6));
+        button.setVisibility(GONE);
+        return button;
     }
 
     public void setPanels(View toolbar, View page) {
@@ -89,14 +108,27 @@ public final class BrowserGestureLayout extends FrameLayout {
         addView(feedback, new LayoutParams(-2, -2, Gravity.TOP | Gravity.CENTER_HORIZONTAL));
         LayoutParams buttonParams = new LayoutParams(dp(56), dp(56), Gravity.BOTTOM | Gravity.END);
         buttonParams.setMargins(dp(16), dp(16), dp(16), dp(16));
-        addView(menuButton, buttonParams);
+        addView(dashboardButton, buttonParams);
+        LayoutParams secondaryParams = new LayoutParams(dp(48), dp(48), Gravity.BOTTOM | Gravity.END);
+        secondaryParams.setMargins(dp(16), dp(16), dp(20), dp(16));
+        addView(menuButton, secondaryParams);
     }
 
-    public void attach(WebView view, Runnable refreshAction) {
+    public void attach(WebView view, Runnable refreshAction, Runnable dashboardAction) {
         cancelGesture();
+        pageProbe++;
+        navigationRevision++;
+        pagePositionKnown = false;
         web = view;
-        view.setOnScrollChangeListener((v, x, y, oldX, oldY) -> updateMenuButton());
+        view.setOnScrollChangeListener((v, x, y, oldX, oldY) -> {
+            if (y > 0) documentAtTop = false;
+            updateActions();
+            removeCallbacks(delayedPageProbe);
+            postDelayed(delayedPageProbe, 100);
+        });
         refresh = refreshAction;
+        goDashboard = dashboardAction;
+        documentAtTop = true;
         reveal();
     }
 
@@ -105,7 +137,8 @@ public final class BrowserGestureLayout extends FrameLayout {
         enabled = value;
         if (!value) { cancelGesture(); reveal(); }
         else if (changed) hideHeaderIfAllowed();
-        updateMenuButton();
+        updateActions();
+        probePageActions();
     }
 
     public void setHeaderAutoHide(boolean value) {
@@ -116,13 +149,32 @@ public final class BrowserGestureLayout extends FrameLayout {
         autoHideHeader = value;
         if (value) hideHeaderIfAllowed();
         else { cancelGesture(); reveal(); }
+        probePageActions();
     }
 
     private void hideHeaderIfAllowed() {
         if (autoHideHeader && usable() && !tracking) animateHeader(barHeight);
     }
 
-    public void setLoading(boolean value) { loading = value; updateMenuButton(); }
+    public void setLoading(boolean value) {
+        loading = value;
+        if (value) { pageProbe++; navigationRevision++; pagePositionKnown = false; }
+        updateActions();
+        probePageActions();
+    }
+    public void setDashboardPage(boolean value) { dashboardPage = value; updateActions(); }
+    public void probePageActions() {
+        if (web == null || web.getUrl() == null) return;
+        WebView source = web;
+        int request = ++pageProbe;
+        String url = source.getUrl();
+        source.evaluateJavascript(PageScrollSupport.probe(actionsAvailable()), result -> {
+            if (request != pageProbe || source != web || !java.util.Objects.equals(url, source.getUrl())) return;
+            pagePositionKnown = "true".equals(result) || "false".equals(result);
+            documentAtTop = "true".equals(result) && !source.canScrollVertically(-1);
+            updateActions();
+        });
+    }
     public boolean isHeaderShown() { return offset < 1; }
     public boolean isHeaderHidden() { return offset >= barHeight - 1; }
     public void reveal() { animateHeader(0); }
@@ -134,9 +186,7 @@ public final class BrowserGestureLayout extends FrameLayout {
 
     @Override public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-            boolean touchingMenu = menuButton.isShown() && event.getX() >= menuButton.getLeft()
-                    && event.getX() <= menuButton.getRight() && event.getY() >= menuButton.getTop()
-                    && event.getY() <= menuButton.getBottom();
+            boolean touchingMenu = touchesAction(menuButton, event) || touchesAction(dashboardButton, event);
             tracking = !touchingMenu && usable() && event.getY() >= page.getTop() && event.getY() < page.getBottom();
             mode = tracking ? Mode.UNDECIDED : Mode.IGNORE;
             sequence++;
@@ -159,8 +209,15 @@ public final class BrowserGestureLayout extends FrameLayout {
         if (event.getActionMasked() == MotionEvent.ACTION_UP || event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
             if (mode == Mode.SCROLL) animateHeader(offset > barHeight / 2f ? barHeight : 0);
             tracking = false;
+            removeCallbacks(delayedPageProbe);
+            postDelayed(delayedPageProbe, 100);
         }
         return result;
+    }
+
+    private boolean touchesAction(View button, MotionEvent event) {
+        return button.isShown() && event.getX() >= button.getLeft() && event.getX() <= button.getRight()
+                && event.getY() >= button.getTop() && event.getY() <= button.getBottom();
     }
 
     @Override public boolean onInterceptTouchEvent(MotionEvent event) {
@@ -291,15 +348,47 @@ public final class BrowserGestureLayout extends FrameLayout {
         LayoutParams params = (LayoutParams) page.getLayoutParams();
         int margin = Math.round(barHeight - offset);
         if (params.topMargin != margin) { params.topMargin = margin; page.setLayoutParams(params); }
-        updateMenuButton();
+        updateActions();
     }
 
-    private void updateMenuButton() {
-        // Leave the website's scroll-to-top control untouched. This shortcut only
-        // occupies the corner once the document has returned to the top.
-        boolean show = autoHideHeader && isHeaderHidden() && !loading && usable()
-                && web.getScrollY() == 0 && !web.canScrollVertically(-1);
-        menuButton.setVisibility(show ? VISIBLE : GONE);
+    private void updateActions() {
+        boolean show = actionsAvailable() && pagePositionKnown;
+        boolean showDashboard = show && !dashboardPage;
+        dashboardButton.setVisibility(showDashboard ? VISIBLE : GONE);
+        menuButton.setVisibility(show && (!documentAtTop || isHeaderHidden()) ? VISIBLE : GONE);
+        menuButton.setImageResource(documentAtTop ? R.drawable.ic_fox_action : R.drawable.ic_scroll_top);
+        int label = documentAtTop ? R.string.show_app_menu : R.string.scroll_to_top;
+        menuButton.setContentDescription(getContext().getString(label));
+        menuButton.setTooltipText(getContext().getString(label));
+        LayoutParams params = (LayoutParams) menuButton.getLayoutParams();
+        int bottom = showDashboard ? dp(84) : dp(16);
+        int size = showDashboard ? dp(48) : dp(56);
+        int endMargin = showDashboard ? dp(20) : dp(16);
+        if (params.bottomMargin != bottom || params.width != size || params.getMarginEnd() != endMargin) {
+            params.bottomMargin = bottom;
+            params.width = params.height = size;
+            params.setMarginEnd(endMargin);
+            menuButton.setLayoutParams(params);
+        }
+    }
+
+    private boolean actionsAvailable() { return autoHideHeader && !loading && usable(); }
+
+    private void activatePageAction() {
+        cancelGesture();
+        if (!actionsAvailable()) return;
+        WebView source = web;
+        int revision = navigationRevision;
+        String url = source.getUrl();
+        // Recheck at activation: a nested scroller may have moved since the last probe.
+        source.evaluateJavascript(PageScrollSupport.activate(), result -> {
+            if (source != web || revision != navigationRevision || !actionsAvailable()
+                    || !java.util.Objects.equals(url, source.getUrl())) return;
+            if ("true".equals(result)) reveal();
+            probePageActions();
+            removeCallbacks(delayedPageProbe);
+            postDelayed(delayedPageProbe, 400);
+        });
     }
 
     private void probePage(float x, float y, int request) {
@@ -334,6 +423,9 @@ public final class BrowserGestureLayout extends FrameLayout {
     }
 
     @Override protected void onDetachedFromWindow() {
+        removeCallbacks(delayedPageProbe);
+        pageProbe++;
+        navigationRevision++;
         getContext().getSystemService(AccessibilityManager.class)
                 .removeTouchExplorationStateChangeListener(explorationListener);
         cancelGesture();

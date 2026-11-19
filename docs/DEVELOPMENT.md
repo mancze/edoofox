@@ -52,6 +52,15 @@ instrumentation-test target and changes which unit-test tasks exist; run the
 debug unit-test command separately without it. The gesture suite uses local
 HTML fixtures; these tests do not log in to a real school.
 
+The gesture suite also exercises the Dashboard action stack, actual button taps,
+app-bar width fallback, large nested scroll containers, and restoration of the
+website's scroll-to-top control when native actions are unavailable. Dashboard
+recognition is deliberately limited to the selected school's root URL (including
+its `#top` anchor); unverified query/hash routes and path aliases stay navigable
+through Home. The page helper temporarily suppresses only Edookit's verified
+`#scroll-to-top` element. Changes to that selector or the site's scrolling layout
+may require adaptation; tests use local fixtures, not authenticated school pages.
+
 The custom instrumentation reports `PASS:`, `FAIL:`, or a process crash.
 Do not rely only on adb's exit code: the local `scripts/run-qa.sh` helper requires
 an explicit PASS and rejects failures. With a dedicated emulator already booted,

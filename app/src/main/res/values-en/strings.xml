@@ -25,6 +25,7 @@
     <string name="gesture_forward">Forward</string>
     <string name="more">More options</string>
     <string name="dashboard">Dashboard</string>
+    <string name="scroll_to_top">Scroll to top</string>
     <string name="menu_navigation">Navigation</string>
     <string name="menu_page">Page</string>
     <string name="menu_app">App</string>
