@@ -46,7 +46,7 @@ public class SmokeInstrumentation extends Instrumentation {
             }
             if ("gestures".equals(phase)) {
                 new GestureChecks(this).run();
-                report.putString("stream", "PASS: automatic content header; pinned login, Plus4U and blank pages; login/logout transitions; manual reveal retention; history, two-step refresh, cancelled pulls, nested scrolling and protected widgets.\n");
+                report.putString("stream", "PASS: Dashboard action stack, app-bar Home and narrow fallback, nested scroll-to-top, website-control restoration; header/login transitions, history, two-step refresh and protected widgets.\n");
                 finish(Activity.RESULT_OK, report);
                 return;
             }

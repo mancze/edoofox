@@ -25,6 +25,7 @@
     <string name="gesture_forward">Vpřed</string>
     <string name="more">Další možnosti</string>
     <string name="dashboard">Nástěnka</string>
+    <string name="scroll_to_top">Nahoru na stránku</string>
     <string name="menu_navigation">Navigace</string>
     <string name="menu_page">Stránka</string>
     <string name="menu_app">Aplikace</string>

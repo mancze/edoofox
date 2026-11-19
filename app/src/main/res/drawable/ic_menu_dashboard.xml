@@ -1,4 +1,7 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="#67339C" android:pathData="M3,3h7v7H3z M14,3h7v7h-7z M3,14h7v7H3z M14,14h7v7h-7z" />
+    <!-- Original outline house in the same simple style as Edookit's Home control. -->
+    <path android:fillColor="@android:color/transparent" android:strokeColor="#67339C"
+        android:strokeWidth="1.5" android:strokeLineJoin="round"
+        android:pathData="M12,2.5 L3,10.2 V21 H9 V13 H15 V21 H21 V10.2 Z" />
 </vector>

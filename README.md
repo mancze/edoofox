@@ -38,6 +38,10 @@ can open other apps, which need their own parental controls.
 - Remember the school and browser session, subject to the website's own
   session-expiry rules.
 - A compact menu with icons and Navigation, Page, and App groups.
+- Off Dashboard, a bottom-right Home button returns to Dashboard, with a smaller
+  scroll-to-top/fox action above it. On Dashboard, only the scroll-to-top/fox
+  action remains. The fox reveals the app bar when already at the top; Home is
+  also pinned in the app bar when there is room, otherwise it stays in the menu.
 - Back/Forward swipes, a fox shortcut to the menu, and deliberate pull-to-refresh.
   Normal scrolling never reveals the menu. Pull down starting at the top to
   reveal it; with the menu already open, a longer pull can refresh.

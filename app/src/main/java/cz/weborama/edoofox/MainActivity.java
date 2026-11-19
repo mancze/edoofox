@@ -74,6 +74,8 @@ public class MainActivity extends Activity {
     private android.widget.EditText schoolInput;
     private TextView schoolLabel;
     private ImageButton refresh;
+    private ImageButton dashboardBar;
+    private int appBarWidth;
     private ImageButton more;
     private ValueCallback<Uri[]> fileCallback;
     private android.window.OnBackInvokedCallback backCallback;
@@ -146,6 +148,10 @@ public class MainActivity extends Activity {
         schoolLabel.setText(links == null ? "" : links.host());
         branding.addView(schoolLabel);
         toolbar.addView(branding, new LinearLayout.LayoutParams(0, -2, 1));
+        dashboardBar = iconButton(R.drawable.ic_menu_dashboard, R.string.dashboard);
+        dashboardBar.setId(R.id.dashboard_bar);
+        dashboardBar.setOnClickListener(v -> webView.loadUrl(home()));
+        toolbar.addView(dashboardBar, new LinearLayout.LayoutParams(dp(48), dp(48)));
         refresh = iconButton(R.drawable.ic_refresh, R.string.refresh);
         refresh.setOnClickListener(v -> reloadPage());
         toolbar.addView(refresh, new LinearLayout.LayoutParams(dp(48), dp(48)));
@@ -153,7 +159,7 @@ public class MainActivity extends Activity {
         more.setOnClickListener(v -> {
             AppMenu menu = new AppMenu(this);
             menu.group(R.string.menu_navigation);
-            menu.action(R.string.dashboard, R.drawable.ic_menu_dashboard, true, () -> webView.loadUrl(home()));
+            menu.action(R.string.dashboard, R.drawable.ic_menu_dashboard, !isDashboardPage(), () -> webView.loadUrl(home()));
             menu.action(R.string.gesture_back, R.drawable.ic_menu_back, webView.canGoBack(), () -> webView.goBack());
             menu.action(R.string.gesture_forward, R.drawable.ic_menu_forward, webView.canGoForward(), () -> webView.goForward());
             menu.group(R.string.menu_page);
@@ -171,6 +177,13 @@ public class MainActivity extends Activity {
         });
         toolbar.addView(more, new LinearLayout.LayoutParams(dp(48), dp(48)));
         toolbar.setBackgroundColor(Color.WHITE);
+        toolbar.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (appBarWidth != right - left) {
+                appBarWidth = right - left;
+                updateDashboardActions();
+            }
+        });
+        updateDashboardActions();
 
         content = new FrameLayout(this);
         webView = new WebView(this);
@@ -350,7 +363,27 @@ public class MainActivity extends Activity {
 
     private String home() { return links.home; }
 
+    private boolean isDashboardPage() {
+        return links != null && webView != null && links.isDashboard(webView.getUrl());
+    }
+
+    private void updateDashboardActions() {
+        boolean onDashboard = isDashboardPage();
+        if (chrome != null) chrome.setDashboardPage(onDashboard);
+        if (dashboardBar != null) {
+            // Keep the existing Refresh and overflow controls. Home is optional;
+            // reserve room for the logo, branding (including larger fonts), and all touch targets.
+            int width = appBarWidth > 0 ? appBarWidth : dp(getResources().getConfiguration().screenWidthDp);
+            int branding = Math.round(dp(144) * getResources().getConfiguration().fontScale);
+            boolean room = width >= dp(44 + 12 + 48 * 3) + branding;
+            boolean browsing = links != null && webView != null && links.isInternal(webView.getUrl())
+                    && !loginPage && schoolPanel != null && schoolPanel.getVisibility() != View.VISIBLE;
+            dashboardBar.setVisibility(browsing && !onDashboard && room ? View.VISIBLE : View.GONE);
+        }
+    }
+
     private void updateGestures() {
+        updateDashboardActions();
         chrome.setGesturesEnabled(school != null && !failed && !keyboardVisible
                 && schoolPanel.getVisibility() != View.VISIBLE);
     }
@@ -373,7 +406,7 @@ public class MainActivity extends Activity {
         pageGeneration++;
         contentSamples = 0;
         chrome.setHeaderAutoHide(false);
-        chrome.attach(webView, this::reloadPage);
+        chrome.attach(webView, this::reloadPage, () -> webView.loadUrl(home()));
         updateGestures();
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
         WebSettings settings = webView.getSettings();
@@ -403,6 +436,7 @@ public class MainActivity extends Activity {
                     return;
                 }
                 retryUrl = url;
+                updateDashboardActions();
                 pageGeneration++;
                 contentSamples = 0;
                 if (LinkPolicy.isAuthentication(url)) chrome.setHeaderAutoHide(false);
@@ -421,6 +455,7 @@ public class MainActivity extends Activity {
                 if (view != webView) return;
                 progress.setVisibility(View.GONE);
                 chrome.setLoading(false);
+                updateDashboardActions();
                 CookieManager.getInstance().flush();
                 checkPageHeader();
             }
@@ -601,6 +636,8 @@ public class MainActivity extends Activity {
 
     private void checkPageHeader() {
         if (!resumed || webView == null) return;
+        updateDashboardActions();
+        chrome.probePageActions();
         WebView source = webView;
         String url = source.getUrl();
         if (failed || links == null || !links.isInternal(url)) {
@@ -628,6 +665,7 @@ public class MainActivity extends Activity {
     private void updateLoginNotice() {
         loginNotice.setVisibility(loginPage && school != null && !failed
                 && schoolPanel.getVisibility() != View.VISIBLE ? View.VISIBLE : View.GONE);
+        updateDashboardActions();
     }
 
     @Override protected void onDestroy() {

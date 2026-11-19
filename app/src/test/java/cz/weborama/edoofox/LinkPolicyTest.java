@@ -34,6 +34,18 @@ public class LinkPolicyTest {
         assertTrue(policy.isInternal("https://ZSSLOVANAK.EDOOKIT.NET:443/messages?q=one#two"));
     }
 
+    @Test public void dashboardIsOnlyTheSelectedSchoolRoot() {
+        for (String suffix : new String[]{"", "/", "/#top", "/#", "/?"}) {
+            assertTrue(suffix, policy.isDashboard("https://zsslovanak.edookit.net" + suffix));
+        }
+        for (String url : new String[]{null, "invalid url", "https://other.edookit.net/",
+                "http://zsslovanak.edookit.net/", policy.home + "messages", policy.home + "dashboard",
+                policy.home + "?page=messages", policy.home + "#/messages", policy.home + "#!/messages",
+                "https://user@zsslovanak.edookit.net/", "https://zsslovanak.edookit.net.evil.test/"}) {
+            assertFalse(String.valueOf(url), policy.isDashboard(url));
+        }
+    }
+
     @Test public void externalAndDeceptiveOriginsNeverStayInside() {
         for (String url : new String[]{"https://edookit.net", "https://other.edookit.net/",
                 "https://zsslovanak.edookit.net.evil.test/", "https://zsslovanak.edookit.net@evil.test/",
