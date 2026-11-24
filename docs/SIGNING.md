@@ -129,8 +129,15 @@ unexpected environment request. Local signing remains a supported alternative.
    enter the existing tag. Approve the signing environment when prompted.
 4. Inspect the draft APK, its `SHA256SUMS.txt`, certificate fingerprint, and
    generated notes. Test installation/update on a suitable device.
-5. Publish the draft manually when satisfied. Do not replace an already
+5. Publish the draft manually when satisfied. Stable releases must not be marked
+   as pre-releases and should be marked as the latest release. Use English for
+   GitHub pull requests and release notes. Do not replace an already
    published version's APK silently; release a new version.
+6. Copy the exact signed, versioned release APK to the maintainer's synced
+   `My Drive/Projekty/Edoofox` delivery folder. Compare its SHA-256 checksum with
+   the GitHub release asset and the source APK. Keep previous versions; never
+   copy signing keys or credentials. This is a local delivery step, outside the
+   GitHub workflow; a local copy alone does not confirm cloud synchronization.
 
 Existing drafts/releases are not overwritten by this workflow. Re-running a
 successful release creation requires handling the existing draft explicitly.
