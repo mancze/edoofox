@@ -31,8 +31,8 @@ android {
         applicationId = "cz.weborama.edoofox"
         minSdk = 26
         targetSdk = 37
-        versionCode = 16
-        versionName = "0.3.13"
+        versionCode = 17
+        versionName = "1.0.0"
         testInstrumentationRunner = "cz.weborama.edoofox.SmokeInstrumentation"
     }
     compileOptions {

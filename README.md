@@ -59,7 +59,7 @@ Screenshot from the isolated QA app using a fictional school; no account data.
 ## Install
 
 Download official APKs from
-[GitHub Releases](https://github.com/mancze/edoofox/releases). The
+[the latest stable GitHub release](https://github.com/mancze/edoofox/releases/latest). The
 [project website](https://mancze.github.io/edoofox/) has a short Czech
 introduction and installation guide.
 

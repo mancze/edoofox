@@ -1,5 +1,12 @@
 # Validation
 
+## Edoofox 1.0.0 — first stable release, 2026-11-24
+
+- Version code 17; application ID and runtime behavior remain unchanged from the approved 0.3.13 release. Installation links now target the latest stable GitHub release.
+- Eight JVM tests, lint, debug and signed release builds passed. Lint reported zero errors and one Gradle-version update warning.
+- Verified the release package as `cz.weborama.edoofox`, version 1.0.0 (17), and its signature against the existing Weborama certificate in `docs/SIGNING.md`. Official 0.3.12/0.3.13 installations can update with this certificate.
+- No UI/gesture code changed; the isolated 0.3.13 gesture, locale and About checks were not repeated. Production app data was not accessed.
+
 ## Edoofox 0.3.13 — Dashboard actions, 2026-11-19
 
 - Version code 16. Added floating Dashboard navigation, scroll-to-top and fox/menu actions, with optional app-bar Home when space allows. Dashboard detection uses the selected school's root URL.
